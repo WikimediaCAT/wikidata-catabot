@@ -2,15 +2,17 @@
 
 require_once( __DIR__ . '/vendor/autoload.php' );
 
+use \Mediawiki\Api as MwApi;
+use \Wikibase\Api as WbApi;
 
-$api = new \Mediawiki\Api\MediawikiApi( "https://www.wikidata.org/w/api.php" );
+$api = new MwApi\MediawikiApi( "https://www.wikidata.org/w/api.php" );
 
 $dataValueClasses = array(
     'unknown' => 'DataValues\UnknownValue',
     'string' => 'DataValues\StringValue',
 );
 
-$wbFactory = new \Wikibase\Api\WikibaseFactory(
+$wbFactory = new WbApi\WikibaseFactory(
     $api,
     new DataValues\Deserializers\DataValueDeserializer( $dataValueClasses ),
     new DataValues\Serializers\DataValueSerializer()
