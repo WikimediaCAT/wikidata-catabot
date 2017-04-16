@@ -1,0 +1,12 @@
+{
+	"wikipedia": {
+		"url": "",
+		"user": "",
+		"password": ""
+	},
+	"wikidata": {
+		"url": "",
+		"user": "",
+		"password": ""
+	}
+}
