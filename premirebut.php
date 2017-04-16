@@ -153,14 +153,34 @@ function addStatement( $wbFactory, $id, $row, $wikiconfig ){
 			$ref = $row[3];
 		}
 		
+		$referenceSnaks = null;
+		if ( $date ) {
+			// Qualifier
+			$qualifierSnaks = array(
+				new PropertyValueSnak( new PropertyId( 'P854' ), new DateTime( $date ) ),
+			);
+		}
+		
+		if ( $ref ) {
+			// Reference URL
+			$referenceSnaks = array(
+				new PropertyValueSnak( new PropertyId( 'P854' ), $ref ),
+			);
+		}
+		
 		if( $statementList->getByPropertyId( PropertyId::newFromNumber( $propId ) )->isEmpty() ) {
-			$statementCreator->create(
+			$statement = $statementCreator->create(
 				new PropertyValueSnak(
 					PropertyId::newFromNumber( $propId ),
 					PropertyId::newFromNumber( retrieveWikidataId( $award, $wikiconfig ) )
 				),
 				$id
 			);
+			
+			if ( $referenceSnaks ) {
+				$statement->addNewReference( $referenceSnaks );
+			}
+			
 		} else {
 			echo "Ignore for ".$id."\n";
 		}
