@@ -1,12 +1,12 @@
 {
 	"wikipedia": {
-		"url": "",
-		"user": "",
-		"password": ""
+		"url": "https://ca.wikipedia.org/w/api",
+		"user": "xxx",
+		"password": "xxx"
 	},
 	"wikidata": {
-		"url": "",
-		"user": "",
-		"password": ""
+		"url": "https://www.wikidata.org/w/api.php",
+		"user": "Catabot",
+		"password": "xxx"
 	}
 }
