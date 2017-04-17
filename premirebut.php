@@ -78,6 +78,7 @@ foreach ( $results as $row ) {
 		$wdid = "Q13406268"; // Dummy, for testing purposes. Must be changed
 		// Add statement and ref
 		addStatement( $wbFactory, $wdid, $row, $wikiconfig );
+		sleep( 5 ); // Delay 5 seconds
 	}
 	
 }
