@@ -72,6 +72,7 @@ foreach ( $results as $row ) {
 	
 	echo $row[0]."\n";
 	
+	// TODO: Handle redirect from wiki
 	$wdid = retrieveWikidataId( $row[0], $wikiconfig );
 	
 	if ( $wdid ) {
@@ -79,6 +80,8 @@ foreach ( $results as $row ) {
 		// Add statement and ref
 		addStatement( $wbFactory, $wdid, $row, $wikiconfig );
 		sleep( 5 ); // Delay 5 seconds
+	} else {
+		echo "- Missing ".$row[0]."\n";
 	}
 	
 }
