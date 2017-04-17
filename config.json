@@ -1,6 +1,6 @@
 {
 	"wikipedia": {
-		"url": "https://ca.wikipedia.org/w/api",
+		"url": "https://ca.wikipedia.org/w/api.php",
 		"user": "xxx",
 		"password": "xxx"
 	},

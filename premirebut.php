@@ -4,6 +4,7 @@ require_once( __DIR__ . '/vendor/autoload.php' );
 
 use \Mediawiki\Api as MwApi;
 use \Wikibase\Api as WbApi;
+use \Wikibase\DataModel as WbDM;
 
 use League\Csv\Reader;
 
@@ -25,7 +26,7 @@ if ( ! file_exists( $conffile ) || ! file_exists( $csvfile ) ) {
 }
 
 
-$confjson = file_get_contents( $conffile );
+$confjson = json_decode( file_get_contents( $conffile ), 1 );
 
 $wikiconfig = null;
 $wikidataconfig = null;
@@ -39,6 +40,9 @@ if ( array_key_exists( "wikidata", $confjson ) ) {
 }
 
 $api = new MwApi\MediawikiApi( $wikidataconfig['url'] );
+
+$api->login( new MwApi\ApiUser( $wikidataconfig['user'], $wikidataconfig['password'] ) );
+
 
 $dataValueClasses = array(
     'unknown' => 'DataValues\UnknownValue',
@@ -68,9 +72,10 @@ foreach ( $results as $row ) {
 	
 	echo $row[0]."\n";
 	
-	$wdid = retrieveWikidataId( $row[0] );
+	$wdid = retrieveWikidataId( $row[0], $wikiconfig );
 	
 	if ( $wdid ) {
+		$wdid = "Q13406268"; // Dummy, for testing purposes. Must be changed
 		// Add statement and ref
 		addStatement( $wbFactory, $wdid, $row, $wikiconfig );
 	}
@@ -85,27 +90,30 @@ function retrieveWikidataId( $title, $wikiconfig ){
 	
 	$title = str_replace( " ", "_", $title );
 	
-	$url = $wikiconfig["url"]."?action=query&prop=wbentityusage&titles=".$title;
+	$url = $wikiconfig["url"]."?action=query&prop=wbentityusage&titles=".$title."&format=json";
 	
 	// Process url
 	$json = file_get_contents( $url );
-	
+
 	// Proceess JSON
 	$obj = json_decode( $json, true );
+		
+	if ( $obj ) {
 	
-	if ( array_key_exists( "query", $obj ) ) {
-
-		if ( array_key_exists( "pages", $obj['query'] ) ) {
-
-			// Assume first key
-			foreach ( $obj['query']["pages"] as $key => $struct ) {
-				
-				if ( array_key_exists( "wbentityusage", $struct ) ) {
-					
-					$wdid = retrieveWikidataIdfromStruct( $struct );
+		if ( array_key_exists( "query", $obj ) ) {
+	
+			if ( array_key_exists( "pages", $obj['query'] ) ) {
+	
+				// Assume first key
+				foreach ( $obj['query']["pages"] as $key => $struct ) {
+										
+					if ( array_key_exists( "wbentityusage", $struct ) ) {
+						
+						$wdid = retrieveWikidataIdfromStruct( $struct["wbentityusage"] );
+						
+					}
 					
 				}
-				
 			}
 		}
 	}
@@ -136,9 +144,15 @@ function addStatement( $wbFactory, $id, $row, $wikiconfig ){
 	
 	$revision = $wbFactory->newRevisionGetter()->getFromId( $id );
 	$item = $revision->getContent()->getData();
+	
 	$statementList = $item->getStatements();
-
-	$propId = 1320;
+	
+	// $statementCreator = $wbFactory->newStatementCreator();
+	
+	$propId = 'P166'; // award given
+	$datePropId = 'P585'; //date
+	$refUrlPropId = 'P854'; // ref url
+	
 	if ( array_key_exists( 1, $row ) ) {
 		
 		$award = $row[1];
@@ -153,39 +167,117 @@ function addStatement( $wbFactory, $id, $row, $wikiconfig ){
 			$ref = $row[3];
 		}
 		
+		$qualifierSnaks = null;
 		$referenceSnaks = null;
+		$referenceArray = null;
+
 		if ( $date ) {
 			// Qualifier
+			
+			$date = "+".$date."-00-00T00:00:00Z";
 			$qualifierSnaks = array(
-				new PropertyValueSnak( new PropertyId( 'P854' ), new DateTime( $date ) ),
+				// Year precision
+
+				new WbDM\Snak\PropertyValueSnak( new WbDM\Entity\PropertyId( $datePropId ), new DataValues\TimeValue( $date, 0, 0, 0, 9, "http://www.wikidata.org/entity/Q1985727" ) ),
 			);
+						
 		}
+		
 		
 		if ( $ref ) {
 			// Reference URL
 			$referenceSnaks = array(
-				new PropertyValueSnak( new PropertyId( 'P854' ), $ref ),
-			);
-		}
-		
-		if( $statementList->getByPropertyId( PropertyId::newFromNumber( $propId ) )->isEmpty() ) {
-			$statement = $statementCreator->create(
-				new PropertyValueSnak(
-					PropertyId::newFromNumber( $propId ),
-					PropertyId::newFromNumber( retrieveWikidataId( $award, $wikiconfig ) )
-				),
-				$id
+				new WbDM\Snak\PropertyValueSnak( new WbDM\Entity\PropertyId( $refUrlPropId ), new DataValues\StringValue( $ref ) ),
 			);
 			
-			if ( $referenceSnaks ) {
-				$statement->addNewReference( $referenceSnaks );
-			}
+			$referenceArray = array( new WbDM\Reference( $referenceSnaks ) );
+			
+		}
+		
+		
+		$propIdObject = new WbDM\Entity\PropertyId( $propId );
+		$itemId = retrieveWikidataId( $award, $wikiconfig );
+		$itemIdObject = new WbDM\Entity\ItemId( $itemId );
+		$entityObject = new WbDM\Entity\EntityIdValue( $itemIdObject );
+		
+		$statementListProp = $statementList->getByPropertyId(  $propIdObject );
+		if( $statementListProp->isEmpty() ) {
+			$mainSnak =
+				new WbDM\Snak\PropertyValueSnak(
+					$propIdObject,
+					$entityObject
+				);
+				
+			$statementList->addNewStatement( $mainSnak, $qualifierSnaks, $referenceArray );
+			$saver->save( $revision );
+			echo "+ ".$id." added\n";
 			
 		} else {
-			echo "Ignore for ".$id."\n";
+			
+			$exists = false;
+			$add = false;
+			
+			foreach ( $statementListProp as $statement ) {
+				
+				// Get Main Snak
+				$mainSnak = $statement->getMainSnak();
+				$datavalue = $mainSnak->getDataValue();
+				
+				if ( $datavalue->getEntityId()->getNumericId() === $itemIdObject->getNumericId() ) {
+					
+					$exists = true;
+					
+					// Already exists
+										
+					// Check qualifiers
+					$qualifiers = $statement->getQualifiers();
+					
+					// If no qualifiers, add to statement
+					if ( count( $qualifiers ) < 1 ) {
+						$statement->setQualifiers( new WbDM\Snak\SnakList( $qualifierSnaks ) );
+						$add = true;
+					}
+										
+					// Check references
+					$references = $statement->getReferences();
+
+					// If no references, add to statement
+					if ( count( $references ) < 1 ) {
+						$statement->addNewReference( $referenceSnaks );
+						$add = true;
+					}
+
+					break;
+					
+				}
+				
+			}
+			
+			if ( ! $exists ) {
+				
+				// Add for this case
+				$mainSnak =
+				new WbDM\Snak\PropertyValueSnak(
+					$propIdObject,
+					$entityObject
+				);
+				
+				$statementList->addNewStatement( $mainSnak, $qualifierSnaks, $referenceSnaks );
+				$saver->save( $revision );
+				echo "+ ".$id." added\n";
+
+			} else {
+			
+				if ( $add ) {
+					$saver->save( $revision );
+					echo "= ".$id." modified\n";
+
+				}
+			}
+			
+			echo "= ".$id." already exists\n";
 		}
-		
-		$saver->save( $revision );
+
 	
 	}
 }
