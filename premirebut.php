@@ -4,6 +4,7 @@ require_once( __DIR__ . '/vendor/autoload.php' );
 
 use \Mediawiki\Api as MwApi;
 use \Wikibase\Api as WbApi;
+use \Mediawiki\DataModel as MwDM;
 use \Wikibase\DataModel as WbDM;
 
 use League\Csv\Reader;
@@ -180,6 +181,8 @@ function addStatement( $wbFactory, $id, $row, $wikiconfig ){
 	
 	// $statementCreator = $wbFactory->newStatementCreator();
 	
+	$editdesc = "Adding awarded prize info via bot premirebut.php";
+
 	$propId = 'P166'; // award given
 	$datePropId = 'P585'; //date
 	$refUrlPropId = 'P854'; // ref url
@@ -240,7 +243,7 @@ function addStatement( $wbFactory, $id, $row, $wikiconfig ){
 				);
 				
 			$statementList->addNewStatement( $mainSnak, $qualifierSnaks, $referenceArray );
-			$saver->save( $revision );
+			$saver->save( $revision, new MwDM\EditInfo( $editdesc ) );
 			echo "+ ".$id." added\n";
 			
 		} else {
@@ -294,13 +297,13 @@ function addStatement( $wbFactory, $id, $row, $wikiconfig ){
 				);
 				
 				$statementList->addNewStatement( $mainSnak, $qualifierSnaks, $referenceSnaks );
-				$saver->save( $revision );
+				$saver->save( $revision, new MwDM\EditInfo( $editdesc ) );
 				echo "+ ".$id." added\n";
 
 			} else {
 			
 				if ( $add ) {
-					$saver->save( $revision );
+					$saver->save( $revision, new MwDM\EditInfo( $editdesc ) );
 					echo "= ".$id." modified\n";
 
 				}
