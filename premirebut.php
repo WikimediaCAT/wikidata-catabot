@@ -74,9 +74,8 @@ foreach ( $results as $row ) {
 	
 	// TODO: Handle redirect from wiki
 	$wdid = retrieveWikidataId( $row[0], $wikiconfig );
-	
 	if ( $wdid ) {
-		$wdid = "Q13406268"; // Dummy, for testing purposes. Must be changed
+		// $wdid = "Q13406268"; // Dummy, for testing purposes. Must be changed
 		// Add statement and ref
 		addStatement( $wbFactory, $wdid, $row, $wikiconfig );
 		sleep( 5 ); // Delay 5 seconds
@@ -94,37 +93,65 @@ function retrieveWikidataId( $title, $wikiconfig ){
 	
 	$title = str_replace( " ", "_", $title );
 	
-	$url = $wikiconfig["url"]."?action=query&prop=wbentityusage&titles=".$title."&format=json";
+	// This is for getting all associated Wikidata ID
+	// $url = $wikiconfig["url"]."?action=query&prop=wbentityusage&titles=".$title."&format=json";
+	
+	// Below for main WikiData ID
+	$url = $wikiconfig["url"]."?action=query&titles=".$title."&format=json&prop=pageprops&ppprop=wikibase_item&redirects=true";
 	
 	// Process url
 	$json = file_get_contents( $url );
 
 	// Proceess JSON
 	$obj = json_decode( $json, true );
-		
+
 	if ( $obj ) {
 	
+		// Below for all associated wikidata
+		//if ( array_key_exists( "query", $obj ) ) {
+		//
+		//	if ( array_key_exists( "pages", $obj['query'] ) ) {
+		//
+		//		// Assume first key
+		//		foreach ( $obj['query']["pages"] as $key => $struct ) {
+		//								
+		//			if ( array_key_exists( "wbentityusage", $struct ) ) {
+		//				
+		//				$wdid = retrieveWikidataIdfromStruct( $struct["wbentityusage"] );
+		//				
+		//			}
+		//			
+		//		}
+		//	}
+		//}
+		
 		if ( array_key_exists( "query", $obj ) ) {
-	
+
 			if ( array_key_exists( "pages", $obj['query'] ) ) {
-	
+		
 				// Assume first key
 				foreach ( $obj['query']["pages"] as $key => $struct ) {
 										
-					if ( array_key_exists( "wbentityusage", $struct ) ) {
+					if ( array_key_exists( "pageprops", $struct ) ) {
 						
-						$wdid = retrieveWikidataIdfromStruct( $struct["wbentityusage"] );
+						if ( array_key_exists( "wikibase_item", $struct["pageprops"] ) ) {
 						
+							$wdid = $struct["pageprops"]["wikibase_item"];
+							
+							break;
+						}
 					}
 					
 				}
-			}
+			}	
+			
 		}
 	}
 	
 	return $wdid;
 }
 
+/** Unused function below **/
 function retrieveWikidataIdfromStruct( $struct ){
 	
 	$wikidataid = null;
