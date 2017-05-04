@@ -71,6 +71,12 @@ $results = $reader->fetch();
 
 foreach ( $results as $row ) {
 	
+	if ( substr( $row[0], 0, 1 ) === "#" ) {
+		# Skip if # -> Handling errors, etc.
+		
+		continue;
+	}
+	
 	echo $row[0]."\n";
 	
 	// TODO: Handle redirect from wiki
