@@ -84,6 +84,7 @@ foreach ( $results as $row ) {
 	if ( $wdid ) {
 		// $wdid = "Q13406268"; // Dummy, for testing purposes. Must be changed
 		// Add statement and ref
+		echo $wdid."\n";
 		addStatement( $wbFactory, $wdid, $row, $wikiconfig );
 		sleep( 5 ); // Delay 5 seconds
 	} else {
@@ -301,7 +302,9 @@ function addStatement( $wbFactory, $id, $row, $wikiconfig ){
 					$propIdObject,
 					$entityObject
 				);
-				
+
+				// TODO: Check  $referenceArray vs $referenceSnaks below
+	
 				$statementList->addNewStatement( $mainSnak, $qualifierSnaks, $referenceSnaks );
 				$saver->save( $revision, new MwDM\EditInfo( $editdesc ) );
 				echo "+ ".$id." added\n";
