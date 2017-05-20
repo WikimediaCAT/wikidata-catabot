@@ -8,5 +8,14 @@
 		"url": "https://www.wikidata.org/w/api.php",
 		"user": "Catabot",
 		"password": "xxx"
+	},
+	"tasks": {
+		"awards-year": {
+			"entity": "P166",
+			"qualifier": "P585",
+			"ref": "P854",
+			"desc": "Adding awarded prize info via bot",
+			"precision": "year"
+		}
 	}
 }

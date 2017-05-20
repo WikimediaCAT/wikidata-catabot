@@ -12,6 +12,7 @@ use League\Csv\Reader;
 // Detect commandline args
 $conffile = 'config.json';
 $csvfile = 'list.csv';
+$taskname = null; // If no task given, first key will be provided
 
 if ( count( $argv ) > 1 ) {
 	$conffile = $argv[1];
@@ -21,11 +22,14 @@ if ( count( $argv ) > 2 ) {
 	$csvfile = $argv[2];
 }
 
+if ( count( $argv ) > 3 ) {
+	$taskname = $argv[3];
+}
+
 // Detect if files
 if ( ! file_exists( $conffile ) || ! file_exists( $csvfile ) ) {
 	die( "Files needed" );
 }
-
 
 $confjson = json_decode( file_get_contents( $conffile ), 1 );
 
@@ -38,6 +42,29 @@ if ( array_key_exists( "wikipedia", $confjson ) ) {
 
 if ( array_key_exists( "wikidata", $confjson ) ) {
 	$wikidataconfig = $confjson["wikidata"];
+}
+
+if ( array_key_exists( "tasks", $confjson ) ) {
+	$tasksConf = $confjson["tasks"];
+}
+
+$tasks = array_keys( $tasksConf );
+$props = null;
+
+if ( count( $tasks ) < 1 ) {
+	// No task, exit
+	exit;
+}
+
+if ( ! $taskname ) {
+	$taskname = array_shift( $tasks );
+} else {
+	if ( in_array( $taskname, $tasks ) ) {
+		$props = $tasksConf[ $taskname ];
+	} else {
+		// Some error here. Stop it
+		exit;
+	}
 }
 
 $api = new MwApi\MediawikiApi( $wikidataconfig['url'] );
@@ -85,7 +112,7 @@ foreach ( $results as $row ) {
 		// $wdid = "Q13406268"; // Dummy, for testing purposes. Must be changed
 		// Add statement and ref
 		echo $wdid."\n";
-		addStatement( $wbFactory, $wdid, $row, $wikiconfig );
+		addStatement( $wbFactory, $wdid, $row, $props, $wikiconfig );
 		sleep( 5 ); // Delay 5 seconds
 	} else {
 		echo "- Missing ".$row[0]."\n";
@@ -177,7 +204,25 @@ function retrieveWikidataIdfromStruct( $struct ){
 	return $wikidataid;
 }
 
-function addStatement( $wbFactory, $id, $row, $wikiconfig ){
+
+/* Return timevalue */
+function transformDate( $datestr, $precision="year", $calendar="http://www.wikidata.org/entity/Q1985727" ) {
+	
+	// TODO: This should be adapted to different precisions 
+	$t1 = 0;
+	$t2 = 0;
+	$t3 = 0;
+	$t4 = 9;
+	
+	$datestr = "+".$datestr."-00-00T00:00:00Z";
+	
+	$timeValue =  new DataValues\TimeValue( $date, $t1, $t2, $t3, $t4, $calendar );
+	
+	return $timeValue;
+}
+
+/* Function for adding statements */
+function addStatement( $wbFactory, $id, $row, $props, $wikiconfig ){
 	
 	$saver = $wbFactory->newRevisionSaver();
 	
@@ -188,47 +233,53 @@ function addStatement( $wbFactory, $id, $row, $wikiconfig ){
 	
 	// $statementCreator = $wbFactory->newStatementCreator();
 	
-	$editdesc = "Adding awarded prize info via bot premirebut.php";
+	$editdesc = $props["desc"];
 
-	$propId = 'P166'; // award given
-	$datePropId = 'P585'; //date
-	$refUrlPropId = 'P854'; // ref url
+	// Value types should be considered here or in config somehow
+	$propId = $props["entity"];
+	$qualifierPropId = $props["qualifier"];
+	$refPropId = $props["ref"];
+	$precision = $props["precision"];
+	
+	if ( ! $propId ) {
+		// Kill it if no Prop
+		exit;
+	}
 	
 	if ( array_key_exists( 1, $row ) ) {
 		
-		$award = $row[1];
-		$date = null;
-		$ref = null;
+		$entityValue = $row[1];
+		$qualifierValue = null;
+		$refValue = null;
 		
 		if ( array_key_exists( 2, $row ) ) {
-			$date = $row[2];
+			$qualifierValue = $row[2];
 		}
 
 		if ( array_key_exists( 3, $row ) ) {
-			$ref = $row[3];
+			$refValue = $row[3];
 		}
 		
 		$qualifierSnaks = null;
 		$referenceSnaks = null;
 		$referenceArray = null;
 
-		if ( $date ) {
+		if ( $qualifierValue ) {
 			// Qualifier
 			
-			$date = "+".$date."-00-00T00:00:00Z";
 			$qualifierSnaks = array(
 				// Year precision
 
-				new WbDM\Snak\PropertyValueSnak( new WbDM\Entity\PropertyId( $datePropId ), new DataValues\TimeValue( $date, 0, 0, 0, 9, "http://www.wikidata.org/entity/Q1985727" ) ),
+				new WbDM\Snak\PropertyValueSnak( new WbDM\Entity\PropertyId( $qualifierPropId ), transformDate( $qualifierValue, $precision ) ),
 			);
 						
 		}
 		
 		
-		if ( $ref ) {
+		if ( $refValue ) {
 			// Reference URL
 			$referenceSnaks = array(
-				new WbDM\Snak\PropertyValueSnak( new WbDM\Entity\PropertyId( $refUrlPropId ), new DataValues\StringValue( $ref ) ),
+				new WbDM\Snak\PropertyValueSnak( new WbDM\Entity\PropertyId( $refPropId ), new DataValues\StringValue( $refValue ) ),
 			);
 			
 			$referenceArray = array( new WbDM\Reference( $referenceSnaks ) );
@@ -237,7 +288,7 @@ function addStatement( $wbFactory, $id, $row, $wikiconfig ){
 		
 		
 		$propIdObject = new WbDM\Entity\PropertyId( $propId );
-		$itemId = retrieveWikidataId( $award, $wikiconfig );
+		$itemId = retrieveWikidataId( $entityValue, $wikiconfig );
 		$itemIdObject = new WbDM\Entity\ItemId( $itemId );
 		$entityObject = new WbDM\Entity\EntityIdValue( $itemIdObject );
 		
