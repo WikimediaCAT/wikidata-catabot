@@ -354,9 +354,9 @@ function addStatement( $wbFactory, $id, $row, $props, $wikiconfig ){
 					$entityObject
 				);
 
-				// TODO: Check  $referenceArray vs $referenceSnaks below
-	
-				$statementList->addNewStatement( $mainSnak, $qualifierSnaks, $referenceSnaks );
+				// Moved to $referenceArray
+
+				$statementList->addNewStatement( $mainSnak, $qualifierSnaks, $referenceArray );	
 				$saver->save( $revision, new MwDM\EditInfo( $editdesc ) );
 				echo "+ ".$id." added\n";
 
