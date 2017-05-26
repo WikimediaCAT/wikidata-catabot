@@ -58,6 +58,7 @@ if ( count( $tasks ) < 1 ) {
 
 if ( ! $taskname ) {
 	$taskname = array_shift( $tasks );
+	$props = $tasksConf[ $taskname ];
 } else {
 	if ( in_array( $taskname, $tasks ) ) {
 		$props = $tasksConf[ $taskname ];
@@ -216,7 +217,7 @@ function transformDate( $datestr, $precision="year", $calendar="http://www.wikid
 	
 	$datestr = "+".$datestr."-00-00T00:00:00Z";
 	
-	$timeValue =  new DataValues\TimeValue( $date, $t1, $t2, $t3, $t4, $calendar );
+	$timeValue =  new DataValues\TimeValue( $datestr, $t1, $t2, $t3, $t4, $calendar );
 	
 	return $timeValue;
 }
