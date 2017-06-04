@@ -127,60 +127,68 @@ function retrieveWikidataId( $title, $wikiconfig ){
 
 	$wdid = null;
 	
-	$title = str_replace( " ", "_", $title );
-	
-	// This is for getting all associated Wikidata ID
-	// $url = $wikiconfig["url"]."?action=query&prop=wbentityusage&titles=".$title."&format=json";
-	
-	// Below for main WikiData ID
-	$url = $wikiconfig["url"]."?action=query&titles=".$title."&format=json&prop=pageprops&ppprop=wikibase_item&redirects=true";
-	
-	// Process url
-	$json = file_get_contents( $url );
-
-	// Proceess JSON
-	$obj = json_decode( $json, true );
-
-	if ( $obj ) {
-	
-		// Below for all associated wikidata
-		//if ( array_key_exists( "query", $obj ) ) {
-		//
-		//	if ( array_key_exists( "pages", $obj['query'] ) ) {
-		//
-		//		// Assume first key
-		//		foreach ( $obj['query']["pages"] as $key => $struct ) {
-		//								
-		//			if ( array_key_exists( "wbentityusage", $struct ) ) {
-		//				
-		//				$wdid = retrieveWikidataIdfromStruct( $struct["wbentityusage"] );
-		//				
-		//			}
-		//			
-		//		}
-		//	}
-		//}
+	# If Q value
+	if ( preg_match( "/^Q\d+/", $title ) ) {
 		
-		if ( array_key_exists( "query", $obj ) ) {
-
-			if ( array_key_exists( "pages", $obj['query'] ) ) {
+		$wdid = $title;
 		
-				// Assume first key
-				foreach ( $obj['query']["pages"] as $key => $struct ) {
-										
-					if ( array_key_exists( "pageprops", $struct ) ) {
-						
-						if ( array_key_exists( "wikibase_item", $struct["pageprops"] ) ) {
-						
-							$wdid = $struct["pageprops"]["wikibase_item"];
-							
-							break;
-						}
-					}
-					
-				}
-			}	
+	} else {
+	
+		$title = str_replace( " ", "_", $title );
+		
+		// This is for getting all associated Wikidata ID
+		// $url = $wikiconfig["url"]."?action=query&prop=wbentityusage&titles=".$title."&format=json";
+		
+		// Below for main WikiData ID
+		$url = $wikiconfig["url"]."?action=query&titles=".$title."&format=json&prop=pageprops&ppprop=wikibase_item&redirects=true";
+		
+		// Process url
+		$json = file_get_contents( $url );
+	
+		// Proceess JSON
+		$obj = json_decode( $json, true );
+	
+		if ( $obj ) {
+		
+			// Below for all associated wikidata
+			//if ( array_key_exists( "query", $obj ) ) {
+			//
+			//	if ( array_key_exists( "pages", $obj['query'] ) ) {
+			//
+			//		// Assume first key
+			//		foreach ( $obj['query']["pages"] as $key => $struct ) {
+			//								
+			//			if ( array_key_exists( "wbentityusage", $struct ) ) {
+			//				
+			//				$wdid = retrieveWikidataIdfromStruct( $struct["wbentityusage"] );
+			//				
+			//			}
+			//			
+			//		}
+			//	}
+			//}
 			
+			if ( array_key_exists( "query", $obj ) ) {
+	
+				if ( array_key_exists( "pages", $obj['query'] ) ) {
+			
+					// Assume first key
+					foreach ( $obj['query']["pages"] as $key => $struct ) {
+											
+						if ( array_key_exists( "pageprops", $struct ) ) {
+							
+							if ( array_key_exists( "wikibase_item", $struct["pageprops"] ) ) {
+							
+								$wdid = $struct["pageprops"]["wikibase_item"];
+								
+								break;
+							}
+						}
+						
+					}
+				}	
+				
+			}
 		}
 	}
 	

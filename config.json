@@ -15,6 +15,12 @@
 			"qualifier": "P585",
 			"ref": "P854",
 			"desc": "Adding awarded prize info via bot"
+		},
+		"members": {
+			"entity": "P463",
+			"qualifier": "P580",
+			"ref": "P854",
+			"desc": "Adding membership info via bot"	
 		}
 	}
 }
