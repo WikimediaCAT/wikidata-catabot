@@ -207,17 +207,38 @@ function retrieveWikidataIdfromStruct( $struct ){
 
 
 /* Return timevalue */
-function transformDate( $datestr, $precision="year", $calendar="http://www.wikidata.org/entity/Q1985727" ) {
+function transformDate( $datestr, $calendar="http://www.wikidata.org/entity/Q1985727" ) {
 	
-	// TODO: This should be adapted to different precisions 
+	// TODO: This should handle exceptions
+	
+	$input = "";
+		
 	$t1 = 0;
 	$t2 = 0;
 	$t3 = 0;
 	$t4 = 9;
 	
-	$datestr = "+".$datestr."-00-00T00:00:00Z";
+	$split = explode( "-", $datestr );
+	if ( count( $split ) > 2 ) {
+		# Day -> Assume. problem if more stuff
+		
+		$t4 = 11;
+		$input = "+".$datestr."T00:00:00Z";
+		
+	} elseif ( count( $split ) == 2 )  {
+		# Month
+		
+		$t4 = 10;
+		$input = "+".$datestr."-00T00:00:00Z";
+		
+	} else {
+		# Year
+		
+		$input = "+".$datestr."-00-00T00:00:00Z";
+	}
+
 	
-	$timeValue =  new DataValues\TimeValue( $datestr, $t1, $t2, $t3, $t4, $calendar );
+	$timeValue =  new DataValues\TimeValue( $input, $t1, $t2, $t3, $t4, $calendar );
 	
 	return $timeValue;
 }
@@ -240,12 +261,13 @@ function addStatement( $wbFactory, $id, $row, $props, $wikiconfig ){
 	$propId = $props["entity"];
 	$qualifierPropId = $props["qualifier"];
 	$refPropId = $props["ref"];
-	$precision = $props["precision"];
 	
 	if ( ! $propId ) {
 		// Kill it if no Prop
 		exit;
 	}
+	
+	// TODO: Handle in the future multiple columns inputs. E.g., more than one qualifier or references
 	
 	if ( array_key_exists( 1, $row ) ) {
 		
@@ -269,9 +291,8 @@ function addStatement( $wbFactory, $id, $row, $props, $wikiconfig ){
 			// Qualifier
 			
 			$qualifierSnaks = array(
-				// Year precision
 
-				new WbDM\Snak\PropertyValueSnak( new WbDM\Entity\PropertyId( $qualifierPropId ), transformDate( $qualifierValue, $precision ) ),
+				new WbDM\Snak\PropertyValueSnak( new WbDM\Entity\PropertyId( $qualifierPropId ), transformDate( $qualifierValue ) ),
 			);
 						
 		}
