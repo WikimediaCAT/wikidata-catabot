@@ -367,6 +367,15 @@ function addStatement( $wbFactory, $id, $row, $props, $wikiconfig ){
 					if ( count( $references ) < 1 ) {
 						$statement->addNewReference( $referenceSnaks );
 						$add = true;
+					} else {
+						
+						// TODO: Check references
+						
+						// If the same $refPropId and $refValue in some of them, do nothing
+						
+						// otherwise, add extra reference 
+						// $statement->addNewReference( $referenceSnaks );
+						
 					}
 
 					break;
