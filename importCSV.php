@@ -283,6 +283,16 @@ function addStatement( $wbFactory, $id, $row, $props, $wikiconfig, $refadd=false
 		exit;
 	}
 	
+	// Enable removing wrong refs
+	$wrongref = null;
+	if ( array_key_exists( "wrongref", $props ) ) {
+		
+		if ( is_array( $props["wrongref"] ) ) {
+			$wrongref = $props["wrongref"];
+		}
+		
+	}
+	
 	// TODO: Handle in the future multiple columns inputs. E.g., more than one qualifier or references
 	
 	if ( array_key_exists( 1, $row ) ) {
@@ -392,6 +402,16 @@ function addStatement( $wbFactory, $id, $row, $props, $wikiconfig, $refadd=false
 								$valuePrev = $snak->getDataValue()->getValue();
 								
 								if ( $refValue != $valuePrev ) {
+									
+									// Check if reference must be removed
+									if ( $wrongref ) {
+										if ( in_array( $valuePrev, $wrongref ) ) {
+											$references->removeReference( $reference );
+											$add = true;
+											echo "- Removed ref\n";
+										}
+									}
+									
 									$refaddcount = $refaddcount + 1;
 								} 
 								
