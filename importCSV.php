@@ -13,6 +13,8 @@ use League\Csv\Reader;
 $conffile = 'config.json';
 $csvfile = 'list.csv';
 $taskname = null; // If no task given, first key will be provided
+$refadd = false; // Default no adding extra refs
+
 
 if ( count( $argv ) > 1 ) {
 	$conffile = $argv[1];
@@ -46,6 +48,12 @@ if ( array_key_exists( "wikidata", $confjson ) ) {
 
 if ( array_key_exists( "tasks", $confjson ) ) {
 	$tasksConf = $confjson["tasks"];
+}
+
+if ( array_key_exists( "refadd", $confjson ) ) {
+	if ( $confjson["refadd"] ) {
+		$refadd = true;
+	}
 }
 
 $tasks = array_keys( $tasksConf );
@@ -113,7 +121,7 @@ foreach ( $results as $row ) {
 		// $wdid = "Q13406268"; // Dummy, for testing purposes. Must be changed
 		// Add statement and ref
 		echo $wdid."\n";
-		addStatement( $wbFactory, $wdid, $row, $props, $wikiconfig );
+		addStatement( $wbFactory, $wdid, $row, $props, $wikiconfig, $refadd );
 		sleep( 5 ); // Delay 5 seconds
 	} else {
 		echo "- Missing ".$row[0]."\n";
@@ -252,7 +260,7 @@ function transformDate( $datestr, $calendar="http://www.wikidata.org/entity/Q198
 }
 
 /* Function for adding statements */
-function addStatement( $wbFactory, $id, $row, $props, $wikiconfig ){
+function addStatement( $wbFactory, $id, $row, $props, $wikiconfig, $refadd=false ){
 	
 	$saver = $wbFactory->newRevisionSaver();
 	
@@ -369,13 +377,36 @@ function addStatement( $wbFactory, $id, $row, $props, $wikiconfig ){
 						$add = true;
 					} else {
 						
-						// TODO: Check references
-						
-						// If the same $refPropId and $refValue in some of them, do nothing
+						$refaddcount = 0;
+						$refcount = 0;
 						
 						// otherwise, add extra reference 
-						// $statement->addNewReference( $referenceSnaks );
+						foreach ( $references as $reference ) {
+							
+							// Get snaks
+							$snaks = $reference->getSnaks();
+							
+							foreach ( $snaks as $snak ) {
+								
+								// $propertyPrev = "P".$snak->getPropertyId()->getNumericId();
+								$valuePrev = $snak->getDataValue()->getValue();
+								
+								if ( $refValue != $valuePrev ) {
+									$refaddcount = $refaddcount + 1;
+								} 
+								
+							}
+							
+							$refcount = $refcount + 1;
+						}
 						
+						if ( $refaddcount >= $refcount && $refadd ) {
+							$statement->addNewReference( $referenceSnaks );
+							$add = true;
+							echo "+ Ref Does not exist. Added\n";
+						} else {
+							echo "= Ref already exists\n";
+						}
 					}
 
 					break;
