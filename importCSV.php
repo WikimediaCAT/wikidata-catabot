@@ -285,6 +285,8 @@ function addStatement( $wbFactory, $id, $row, $props, $wikiconfig, $refadd=false
 	
 	// Enable removing wrong refs
 	$wrongref = null;
+	$forceref = false;
+	
 	if ( array_key_exists( "wrongref", $props ) ) {
 		
 		if ( is_array( $props["wrongref"] ) ) {
@@ -292,6 +294,15 @@ function addStatement( $wbFactory, $id, $row, $props, $wikiconfig, $refadd=false
 		}
 		
 	}
+	
+	if ( array_key_exists( "forceref", $props ) ) {
+		
+		if ( $props["forceref"] ) {
+			$forceref= true;
+		}
+		
+	}
+
 	
 	// TODO: Handle in the future multiple columns inputs. E.g., more than one qualifier or references
 	
@@ -410,6 +421,14 @@ function addStatement( $wbFactory, $id, $row, $props, $wikiconfig, $refadd=false
 											$add = true;
 											echo "- Removed ref\n";
 										}
+									} else {
+										
+										if ( $forceref ) {
+											$references->removeReference( $reference );
+											echo "- Removed ref\n";
+											$refadd = true; // Tell to add reference now
+										}
+										
 									}
 									
 									$refaddcount = $refaddcount + 1;
@@ -419,7 +438,7 @@ function addStatement( $wbFactory, $id, $row, $props, $wikiconfig, $refadd=false
 							
 							$refcount = $refcount + 1;
 						}
-						
+
 						if ( $refaddcount >= $refcount && $refadd ) {
 							$statement->addNewReference( $referenceSnaks );
 							$add = true;
