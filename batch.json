@@ -12,6 +12,7 @@
 	"tasks": {
 		"users": {
 			"desc": "Adding user info",
+			"lang": "ca",
 			"add": [
 				{
 					"prop": "",

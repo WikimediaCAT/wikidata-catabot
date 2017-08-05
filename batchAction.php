@@ -99,8 +99,6 @@ $reader->setDelimiter("\t");
 
 $results = $reader->fetch();
 
-var_dump( $results );
-
 foreach ( $results as $row ) {
 	
 	if ( substr( $row[0], 0, 1 ) === "#" ) {
@@ -120,7 +118,19 @@ foreach ( $results as $row ) {
 		performAction( $wbFactory, $wdid, $row, $props, $wikiconfig );
 		sleep( 5 ); // Delay 5 seconds
 	} else {
+		
 		echo "- Missing ".$row[0]."\n";
+
+		$wdid = createItem( $wbFactory, $row, $props );
+		
+		if ( $wdid ) {
+			
+			performAction( $wbFactory, $wdid, $row, $props, $wikiconfig );
+			sleep( 5 ); // Delay 5 seconds
+		
+		} else {
+			echo "- Could not create ".$row[0]."\n";
+		}
 	}
 	
 }
@@ -215,6 +225,60 @@ function retrieveWikidataIdfromStruct( $struct ){
 	}
 	
 	return $wikidataid;
+}
+
+function createItem( $wbFactory, $row, $props ) {
+	
+	$saver = $wbFactory->newRevisionSaver();
+	
+	$fingerprint = addFingerprintFromRow( $row, $props );
+	
+	$itemId = null;
+	
+	if ( $fingerprint ) {
+		
+		$item = new WbDM\Entity\Item( null, $fingerprint );
+		
+		$edit = new MwDM\Revision( new WbDM\ItemContent( $item ) );
+		$editdesc = new MwDM\EditInfo( "Adding ".$row[0] );
+		
+		$resultingItem = $saver->save( $edit, $editdesc );
+		
+		$itemId = $resultingItem->getId();
+		
+		if ( $itemId ) {
+			echo "Added item $itemId\n";
+		}
+	
+	}
+	
+	return $itemId;
+}
+
+function addFingerprintFromRow( $row, $props ) {
+	
+	$lang = "en";
+	
+	if ( array_key_exists( "lang", $props ) ) {
+		$lang = $props["lang"];
+	}
+	
+	$labels = null;
+	$descriptions = null;
+	$aliases = null;
+	$fingerprint = null;
+	
+	// For now consider only label
+	
+	if ( $row[0] ) {
+
+		$labelObj = new WbDM\Term\Term( $lang, $row[0] );
+		$labels = new WbDM\Term\TermList( array( $labelObj ) );
+		$fingerprint = new WbDM\Term\Fingerprint( $labels, $descriptions, $aliases );
+	}
+	
+	return  $fingerprint;
+	
 }
 
 
@@ -382,7 +446,7 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 			
 			if ( $type === "add" ) {
 				$statementList->addNewStatement( $mainSnak, $qualifierSnaks, $referenceArray );
-				echo "+ ".$id." added\n";
+				echo "added statement $propId : $propValue\n";
 				return true;				
 			}
 			if ( $type === "delete" ) {
@@ -541,7 +605,7 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 			foreach ( $statementGuidToRemove as $guid ) {
 				if ( $guid ) {
 					$statementList->removeStatementsWithGuid( $guid );
-					echo "rm statement\n";
+					echo "deleted statement $propId : $propValue\n";
 				}
 			}
 			
