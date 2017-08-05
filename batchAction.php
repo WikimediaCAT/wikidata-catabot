@@ -247,7 +247,7 @@ function createItem( $wbFactory, $row, $props ) {
 		$itemId = $resultingItem->getId();
 		
 		if ( $itemId ) {
-			echo "Added item $itemId\n";
+			echo "Added item:\t".$itemId."\t".$row[0]."\n";
 		}
 	
 	}
@@ -371,7 +371,7 @@ function performAction( $wbFactory, $id, $row, $props, $wikiconfig ){
 	if ( $numadd > 0 || $numdel > 0 ) {
 		
 		$saver->save( $revision, new MwDM\EditInfo( $editdesc ) );
-		echo "~ ".$id." commited\n";
+		echo "~ Commited:\t".$id."\t".$row[0]."\n";
 
 	}
 	
