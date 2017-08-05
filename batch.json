@@ -1,0 +1,37 @@
+{
+	"wikipedia": {
+		"url": "https://ca.wikipedia.org/w/api.php",
+		"user": "xxx",
+		"password": "xxx"
+	},
+	"wikidata": {
+		"url": "https://www.wikidata.org/w/api.php",
+		"user": "Catabot",
+		"password": "xxx"
+	},
+	"tasks": {
+		"users": {
+			"desc": "Adding user info",
+			"add": [
+				{
+					"prop": "",
+					"propValue": "",
+					"qualifier": "",
+					"qualifierValue": "",
+					"ref": "",
+					"refValue": ""
+				}
+			],
+			"delete": [
+				{
+					"prop": "",
+					"propValue": "",
+					"qualifier": "",
+					"qualifierValue": "",
+					"ref": "",
+					"refValue": ""
+				}
+			]
+		}
+	}
+}
