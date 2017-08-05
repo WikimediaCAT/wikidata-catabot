@@ -99,6 +99,8 @@ $reader->setDelimiter("\t");
 
 $results = $reader->fetch();
 
+var_dump( $results );
+
 foreach ( $results as $row ) {
 	
 	if ( substr( $row[0], 0, 1 ) === "#" ) {
@@ -115,7 +117,7 @@ foreach ( $results as $row ) {
 		// $wdid = "Q13406268"; // Dummy, for testing purposes. Must be changed
 		// Add statement and ref
 		echo $wdid."\n"; // Only considers id -> ACTION done via configuration
-		performAction( $wbFactory, $wdid, $rows, $props, $wikiconfig );
+		performAction( $wbFactory, $wdid, $row, $props, $wikiconfig );
 		sleep( 5 ); // Delay 5 seconds
 	} else {
 		echo "- Missing ".$row[0]."\n";
@@ -282,20 +284,27 @@ function performAction( $wbFactory, $id, $row, $props, $wikiconfig ){
 	if ( array_key_exists( "delete", $props ) ) {
 		$todelete = $props["delete"];
 	}
-		
+	
+	$numadd = 0;
+	$numdel = 0;
+	
 	foreach ( $toadd as $add ) {
 		
-		$valadd = performActionPerId( $wbFactory, $id, $row, $add, $statementList, $wikiconfig, "add" );
+		if ( performActionPerId( $wbFactory, $id, $row, $add, $statementList, $wikiconfig, "add" ) ) {
+			$numadd = $numadd + 1;
+		}
 	}
 	
 	foreach ( $todelete as $delete ) {
 		
-		$valdel = performActionPerId( $wbFactory, $id, $row, $add, $statementList, $wikiconfig, "delete" );
+		if ( performActionPerId( $wbFactory, $id, $row, $delete, $statementList, $wikiconfig, "delete" ) ) {
+			$numdel = $numdel + 1;
+		}
 
 	}
 	
 	
-	if ( $valadd || $valdel ) {
+	if ( $numadd > 0 || $numdel > 0 ) {
 		
 		$saver->save( $revision, new MwDM\EditInfo( $editdesc ) );
 		echo "~ ".$id." commited\n";
@@ -312,23 +321,38 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 	$qualifierValue = null;
 	$refPropId = null;
 	$refValue = null;
-
 	
 	$qualifierSnaks = null;
 	$referenceSnaks = null;
 	$referenceArray = null;
 
-
+	if ( array_key_exists( "prop", $props ) ){
+		$propId = $props["prop"];
+	}
+	if ( array_key_exists( "propValue", $props ) ){
+		$propValue = $props["propValue"];
+	}	
+	if ( array_key_exists( "qualifier", $props ) ){
+		$qualifierPropId = $props["qualifier"];
+	}
+	if ( array_key_exists( "qualifierValue", $props ) ){
+		$qualifierValue = $props["qualifierValue"];
+	}	
+	if ( array_key_exists( "ref", $props ) ){
+		$refPropId = $props["ref"];
+	}
+	if ( array_key_exists( "refValue", $props ) ){
+		$refValue = $props["refValue"];
+	}
+	
 	if ( $qualifierPropId && $qualifierValue ) {
 		// Qualifier
-		
 		$qualifierSnaks = array(
 			// TODO: This preassumes qualifier is datetime
 			new WbDM\Snak\PropertyValueSnak( new WbDM\Entity\PropertyId( $qualifierPropId ), transformDate( $qualifierValue ) ),
 		);
 					
 	}
-	
 	
 	if ( $refPropId && $refValue ) {
 		// Reference URL
@@ -342,9 +366,9 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 	}
 	
 	if ( $propId && $propValue ) {
-		
+				
 		$propIdObject = new WbDM\Entity\PropertyId( $propId );
-		$itemId = retrieveWikidataId( $entityValue, $wikiconfig );
+		$itemId = retrieveWikidataId( $propValue, $wikiconfig );
 		$itemIdObject = new WbDM\Entity\ItemId( $itemId );
 		$entityObject = new WbDM\Entity\EntityIdValue( $itemIdObject );
 		
@@ -366,9 +390,11 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 			}
 			
 		} else {
+
+			$statementGuidToRemove = [];
 			
 			foreach ( $statementListProp as $statement ) {
-				
+
 				// Get Main Snak
 				$mainSnak = $statement->getMainSnak();
 				$datavalue = $mainSnak->getDataValue();
@@ -503,10 +529,8 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 						
 						if ( $type === "delete" ) {
 						
-							$statementRemover = $wbFactory->newStatementRemover();
-							$statementRemover->remove( $statement );
-							echo "rm statement\n";
-							return true;
+							array_push( $statementGuidToRemove, $statement->getGuid() );
+
 						}
 					}
 										
@@ -514,11 +538,21 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 				
 			}
 			
+			foreach ( $statementGuidToRemove as $guid ) {
+				if ( $guid ) {
+					$statementList->removeStatementsWithGuid( $guid );
+					echo "rm statement\n";
+				}
+			}
+			
+			if ( count( $statementGuidToRemove ) > 0 ) {
+				return true;	
+			}
+			
 			return false;
 		
 		}
-		
-		
+
 		
 	}
 	
