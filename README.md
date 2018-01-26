@@ -9,7 +9,7 @@ Bots per a utilitzar a Wikidata
 
 * addFromORCID.php -> Script per afegir informació a Wikidata a partir de llistats d'ORCID.
 
-### Passos
+### Passos
 
 * Revisar si existeixen o no ja els ORCID a Wikidata.
 * Si no hi són, crear-los.
