@@ -45,3 +45,21 @@ if ( array_key_exists( "orcid", $confjson ) ) {
 
 # Base 
 # curl -X GET --header 'Accept: application/orcid+json' 'https://pub.orcid.org/v2.1/0000-0003-2016-6465'
+
+# Check ORCIDS from query.wikidata.org
+
+#Researchers with Certain ORCID
+//SELECT ?human ?humanLabel ?orcid
+//WHERE 
+//{
+//  ?human wdt:P31 wd:Q5 .
+//  ?human wdt:P496 ?orcid .
+//  FILTER ( 
+//    ?orcid IN ( "0000-0002-5738-4477", "0000-0002-5738-4472" )
+//  )
+//  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+//}
+
+#https://query.wikidata.org/sparql?query=encodedquery&format=json
+
+
