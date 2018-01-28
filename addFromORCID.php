@@ -6,6 +6,8 @@ use \Mediawiki\Api as MwApi;
 use \Wikibase\Api as WbApi;
 use \Mediawiki\DataModel as MwDM;
 
+use League\Csv\Reader;
+
 // Detect commandline args
 $conffile = 'config.json';
 $csvfile = 'list.csv';
@@ -43,23 +45,192 @@ if ( array_key_exists( "orcid", $confjson ) ) {
 	# TODO: to check if needed
 }
 
-# Base 
-# curl -X GET --header 'Accept: application/orcid+json' 'https://pub.orcid.org/v2.1/0000-0003-2016-6465'
 
-# Check ORCIDS from query.wikidata.org
+// Detect if files
+if ( ! file_exists( $conffile ) || ! file_exists( $csvfile ) ) {
+	die( "Files needed" );
+}
 
-#Researchers with Certain ORCID
-//SELECT ?human ?humanLabel ?orcid
-//WHERE 
-//{
-//  ?human wdt:P31 wd:Q5 .
-//  ?human wdt:P496 ?orcid .
-//  FILTER ( 
-//    ?orcid IN ( "0000-0002-5738-4477", "0000-0002-5738-4472" )
-//  )
-//  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-//}
+$researchers = array();
 
-#https://query.wikidata.org/sparql?query=encodedquery&format=json
+$inGroupNumber = 20; // To be included in configuration
+$orcidarrays = array( );
+
+$reader = Reader::createFromPath( $csvfile );
+
+$reader->setOffset(1);
+$reader->setDelimiter("\t");
+
+$results = $reader->fetch();
+
+$rstart = 0;
+$rcount = 0;
+
+foreach ( $results as $row ) {
+
+	$row[0] = trim( $row[0] );
+	
+	if ( substr( $row[0], 0, 1 ) === "#" ) {
+		# Skip if # -> Handling errors, etc.
+		
+		continue;
+	}
+
+	if ( $row[0] === "" ) {
+		
+		continue;
+	}
+	
+	if ( $rcount == $inGroupNumber ) {
+		$rcount = 0;
+		$rstart = $rstart + 1;
+	}
+	
+	if ( ! array_key_exists( $rstart, $orcidarrays ) ) {
+		$orcidarrays[ $rstart ] = array( );
+	}
+
+	array_push( $orcidarrays[ $rstart ], $row[0] );
+
+	$researchers[ $row[0] ] = array(); // Adding to array of researchers
+	
+	$rcount = $rcount + 1;	
+}
+
+foreach ( $orcidarrays as $orcidarray ) {
+	
+	$arr = array();
+	
+	foreach ( $orcidarray as $orarr ) {
+		
+		$orarr = "\"".$orarr."\"";
+		array_push( $arr, $orarr );
+	}
+	
+	# Researchers with ORCID and group added
+	$query = "SELECT ?human ?humanLabel ?orcid WHERE  {
+	?human wdt:P31 wd:Q5 .
+	?human wdt:P496 ?orcid .
+	FILTER ( 
+		?orcid IN ( ".implode( ", ", $arr )." )
+	)
+	SERVICE wikibase:label { bd:serviceParam wikibase:language \"[AUTO_LANGUAGE],en\". }
+}
+";
+
+	$url = "https://query.wikidata.org/sparql?query=".urlencode( $query )."&format=json";
+	
+	$obj = json_decode( file_get_contents( $url ), true );
+	
+	if ( $obj ) {
+		$researchers = addQuery2array( $researchers, $obj );
+	}
+	
+	sleep( 1 );
+}
+
+# Process ORCID script
+// Create a stream
+$opts = [
+    "http" => [
+        "method" => "GET",
+        "header" => "Accept: application/orcid+json\r\n"
+    ]
+];
+
+$context = stream_context_create($opts);
+
+// Open the file using the HTTP headers set above
+$file = file_get_contents('http://www.example.com/', false, $context);
+
+foreach ( $researchers as $key => $value ) {
+	
+	$url = "https://pub.orcid.org/v2.1/".$key;
+	$obj = json_decode( file_get_contents( $url ), true, $context );
+	
+	if ( $obj ) {
+		$researchers = addORCID2array( $researchers, $obj );
+	}
+	
+	sleep( 1 );
+
+}
+
+# From here process to Wikidata
+print_r( $researchers );
+
+
+
+function addQuery2array( $researchers, $obj ) {
+	
+	if ( array_key_exists( "results", $obj ) ) {
+		
+		if ( array_key_exists( "bindings", $obj["results"] ) ) {
+
+			$results = $obj["results"]["bindings"];
+		
+			if ( count( $results > 0  ) ) {
+
+				foreach ( $results as $match ) {
+					
+					# Minimal ORCID
+					if ( array_key_exists( "orcid", $match ) ) {
+						
+						if ( array_key_exists( "value", $match["orcid"] ) ) {
+							
+							$orcidval = $match["orcid"]["value"];
+							if ( $orcidval !== "" ) {
+
+								if ( array_key_exists( "human", $match ) ) 
+									
+									if ( array_key_exists( "value", $match["human"] ) ) {
+										
+										$humanval = $match["human"]["value"];
+										
+										if ( $humanval !== "" ) {
+											
+											$parts = explode( "entity/", $humanval );
+											if ( count( $parts ) === 2 ) {
+												$researchers[ $orcidval ]["wdid"] = trim( $parts[1] );
+											}
+											
+										}
+									}
+
+							}
+							
+							if ( array_key_exists( "humanLabel", $match ) ) {
+									
+								if ( array_key_exists( "value", $match["humanLabel"] ) ) {
+								
+									$labelval = $match["humanLabel"]["value"];
+
+									if ( $labelval !== "" ) {
+										
+										$researchers[ $orcidval ]["label"] = $labelval;
+									}
+								}
+							}
+						}
+					}
+						
+				}
+					
+			}
+				
+		}
+		
+	}
+	
+	return $researchers;
+}
+	
+	
+function addORCID2array( $researchers, $obj ) {
+	
+	
+	
+	return $researchers;
+}
 
 
