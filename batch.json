@@ -9,6 +9,9 @@
 		"user": "Catabot",
 		"password": "xxx"
 	},
+	"delimiter": "\t",
+	"enclosure": "\"",
+	"resolve": true,
 	"tasks": {
 		"users": {
 			"desc": "Adding user info",

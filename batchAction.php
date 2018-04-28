@@ -13,7 +13,9 @@ use League\Csv\Reader;
 $conffile = 'config.json';
 $csvfile = 'list.csv';
 $taskname = null; // If no task given, exit
-
+$resolve = true; // If we allow wikipedia resolving
+$delimiter = "\t"; // Default separator
+$enclosure = "\""; // Default delimiter
 
 if ( count( $argv ) > 1 ) {
 	$conffile = $argv[1];
@@ -47,6 +49,22 @@ if ( array_key_exists( "wikidata", $confjson ) ) {
 
 if ( array_key_exists( "tasks", $confjson ) ) {
 	$tasksConf = $confjson["tasks"];
+}
+
+if ( array_key_exists( "tasks", $confjson ) ) {
+	$tasksConf = $confjson["tasks"];
+}
+
+if ( array_key_exists( "resolve", $confjson ) ) {
+	$resolve = $confjson["resolve"];
+}
+
+if ( array_key_exists( "delimiter", $confjson ) ) {
+	$delimiter = $confjson["delimiter"];
+}
+
+if ( array_key_exists( "enclosure", $confjson ) ) {
+	$enclosure = $confjson["enclosure"];
 }
 
 
@@ -95,11 +113,14 @@ $wbFactory = new WbApi\WikibaseFactory(
 $reader = Reader::createFromPath( $csvfile );
 
 $reader->setOffset(1);
-$reader->setDelimiter("\t");
+$reader->setDelimiter( $delimiter );
+$reader->setEnclosure( $enclosure );
 
 $results = $reader->fetch();
 
 foreach ( $results as $row ) {
+	
+	$wdid = null;
 	
 	if ( substr( $row[0], 0, 1 ) === "#" ) {
 		# Skip if # -> Handling errors, etc.
@@ -108,9 +129,12 @@ foreach ( $results as $row ) {
 	}
 	
 	echo $row[0]."\n";
+
+	// Do we resolve WikiData from Wikipedia?
+	if ( $resolve ) {	
+		$wdid = retrieveWikidataId( $row[0], $wikiconfig );
+	}
 	
-	// TODO: Handle redirect from wiki
-	$wdid = retrieveWikidataId( $row[0], $wikiconfig );
 	if ( $wdid ) {
 		// $wdid = "Q13406268"; // Dummy, for testing purposes. Must be changed
 		// Add statement and ref
@@ -138,6 +162,8 @@ foreach ( $results as $row ) {
 $api->logout();
 
 function retrieveWikidataId( $title, $wikiconfig ){
+
+	// TODO: Handle redirect from wiki
 
 	$wdid = null;
 	
