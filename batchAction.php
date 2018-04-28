@@ -122,6 +122,11 @@ foreach ( $results as $row ) {
 	
 	$wdid = null;
 	
+	# If smaller size, continue
+	if ( count( $row ) < 1 ) {
+		continue;
+	}
+	
 	if ( substr( $row[0], 0, 1 ) === "#" ) {
 		# Skip if # -> Handling errors, etc.
 		
@@ -417,22 +422,22 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 	$referenceArray = null;
 
 	if ( array_key_exists( "prop", $props ) ){
-		$propId = $props["prop"];
+		$propId = resolveRowValue( $props["prop"], $row );
 	}
 	if ( array_key_exists( "propValue", $props ) ){
-		$propValue = $props["propValue"];
+		$propValue = resolveRowValue( $props["propValue"], $row );
 	}	
 	if ( array_key_exists( "qualifier", $props ) ){
-		$qualifierPropId = $props["qualifier"];
+		$qualifierPropId = resolveRowValue( $props["qualifier"], $row );
 	}
 	if ( array_key_exists( "qualifierValue", $props ) ){
-		$qualifierValue = $props["qualifierValue"];
+		$qualifierValue = resolveRowValue( $props["qualifierValue"], $row );
 	}	
 	if ( array_key_exists( "ref", $props ) ){
-		$refPropId = $props["ref"];
+		$refPropId = resolveRowValue( $props["ref"], $row );
 	}
 	if ( array_key_exists( "refValue", $props ) ){
-		$refValue = $props["refValue"];
+		$refValue = resolveRowValue( $props["refValue"], $row );
 	}
 	
 	if ( $qualifierPropId && $qualifierValue ) {
@@ -645,5 +650,14 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 
 		
 	}
+	
+}
+
+/** Further resolve row value from row or beyond **/
+
+function resolveRowValue( $rowValue, $row ) {
+	
+	
+	return $rowValue;
 	
 }
