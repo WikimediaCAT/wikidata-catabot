@@ -52,10 +52,6 @@ if ( array_key_exists( "tasks", $confjson ) ) {
 	$tasksConf = $confjson["tasks"];
 }
 
-if ( array_key_exists( "tasks", $confjson ) ) {
-	$tasksConf = $confjson["tasks"];
-}
-
 if ( array_key_exists( "resolve", $confjson ) ) {
 	$resolve = $confjson["resolve"];
 }
