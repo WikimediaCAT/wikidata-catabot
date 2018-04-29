@@ -16,6 +16,7 @@ $taskname = null; // If no task given, exit
 $resolve = true; // If we allow wikipedia resolving
 $delimiter = "\t"; // Default separator
 $enclosure = "\""; // Default delimiter
+$resolveRow = false; // If we resolve row values
 
 if ( count( $argv ) > 1 ) {
 	$conffile = $argv[1];
@@ -656,7 +657,27 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 /** Further resolve row value from row or beyond **/
 
 function resolveRowValue( $rowValue, $row ) {
+
+	if ( $resolveRow ) {
 	
+		if ( substr( $rowValue, 0, 1 ) === "$" ) {
+	
+			// Then its a variable
+			
+			if ( is_numeric( substr( $rowValue, 1 ) ) ) {
+	
+				$rowNum = substr( $rowValue, 1 );
+				
+				if ( array_key_exists( int( $rowNum ), $row ) ) {
+					
+					$rowValue = $row[int( $rowNum )];
+
+				}
+				
+			}
+		}
+	
+	}
 	
 	return $rowValue;
 	

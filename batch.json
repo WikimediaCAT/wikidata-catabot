@@ -12,6 +12,7 @@
 	"delimiter": "\t",
 	"enclosure": "\"",
 	"resolve": true,
+	"resolveRow": false,
 	"tasks": {
 		"users": {
 			"desc": "Adding user info",
