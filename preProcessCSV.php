@@ -8,6 +8,7 @@ use \Mediawiki\DataModel as MwDM;
 use \Wikibase\DataModel as WbDM;
 
 use League\Csv\Reader;
+use League\Csv\Writer;
 
 // Detect commandline args
 $conffile = 'config.json';
@@ -78,6 +79,7 @@ $wbFactory = new WbApi\WikibaseFactory(
 
 // Cache variable to store queries
 $cache = array();
+$oresults = array();
 
 // If positions to resolve...
 if ( count( $positions ) > 0 ) {
@@ -91,8 +93,123 @@ if ( count( $positions ) > 0 ) {
 	$results = $reader->fetch();
 	
 	foreach ( $results as $row ) {
-	
+		
+		$orow = $row;
+		
+		foreach ( $positions as $pos ) {
+			
+			// We assume pos is int
+			if ( array_key_exists( $pos, $orow ) ) {
+				
+				$orow[$pos] = resolveValue( $orow[$pos] );
+			}
+		}
+
+		array_push( $oresults, $orow );
 	
 	}
 
+}
+
+/** Further resolve value **/
+
+function resolveValue( $rowValue ) {
+
+	$alreadyQ = false;
+	
+	if ( $rowValue ) {
+	
+		if ( substr( $rowValue, 0, 1 ) === "Q" ) {
+	
+			// Then its a variable
+			
+			if ( is_numeric( substr( $rowValue, 1 ) ) ) {
+	
+				$alreadyQ = true;
+				
+			}
+		}
+	
+	}
+	
+	if ( ! $alreadyQ ) {
+		
+		if ( array_key_exists( $rowValue, $cache ) ) {
+			
+			$rowValue = $cache[ $rowValue ];
+			
+		} else {
+		
+			$wdid = retrieveWikidataId( $rowValue, $wikiconfig );
+			
+			if ( $wdid ) {
+				
+				$cache[ $rowValue ] = $wdid;
+				$rowValue = $wdid;
+				
+			}
+		
+		}
+	}
+	
+	return $rowValue;
+	
+}
+
+
+
+function retrieveWikidataId( $title, $wikiconfig ){
+
+	// TODO: Handle redirect from wiki
+
+	$wdid = null;
+	
+	# If Q value
+	if ( preg_match( "/^Q\d+/", $title ) ) {
+		
+		$wdid = $title;
+		
+	} else {
+	
+		$title = str_replace( " ", "_", $title );
+		
+		// This is for getting all associated Wikidata ID
+		// $url = $wikiconfig["url"]."?action=query&prop=wbentityusage&titles=".$title."&format=json";
+		
+		// Below for main WikiData ID
+		$url = $wikiconfig["url"]."?action=query&titles=".$title."&format=json&prop=pageprops&ppprop=wikibase_item&redirects=true";
+		
+		// Process url
+		$json = file_get_contents( $url );
+	
+		// Proceess JSON
+		$obj = json_decode( $json, true );
+	
+		if ( $obj ) {
+			
+			if ( array_key_exists( "query", $obj ) ) {
+	
+				if ( array_key_exists( "pages", $obj['query'] ) ) {
+			
+					// Assume first key
+					foreach ( $obj['query']["pages"] as $key => $struct ) {
+											
+						if ( array_key_exists( "pageprops", $struct ) ) {
+							
+							if ( array_key_exists( "wikibase_item", $struct["pageprops"] ) ) {
+							
+								$wdid = $struct["pageprops"]["wikibase_item"];
+								
+								break;
+							}
+						}
+						
+					}
+				}	
+				
+			}
+		}
+	}
+	
+	return $wdid;
 }
