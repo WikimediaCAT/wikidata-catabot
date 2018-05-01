@@ -408,6 +408,7 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 	
 	$propId = null;
 	$propValue = null;
+	$propValueType = "wikibase-entityid";
 	$qualifierPropId = null;
 	$qualifierValue = null;
 	$refPropId = null;
@@ -422,6 +423,9 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 	}
 	if ( array_key_exists( "propValue", $props ) ){
 		$propValue = resolveRowValue( $props["propValue"], $row );
+	}
+	if ( array_key_exists( "propValueType", $props ) ){
+		$propValueType = resolveRowValue( $props["propValueType"], $row );
 	}	
 	if ( array_key_exists( "qualifier", $props ) ){
 		$qualifierPropId = resolveRowValue( $props["qualifier"], $row );
@@ -461,6 +465,8 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 		$propIdObject = new WbDM\Entity\PropertyId( $propId );
 		// $itemId = retrieveWikidataId( $propValue, $wikiconfig ); -> Let's not resolve here, risky
 		// TODO: Allow more variability, also strings here. Now only Item!
+		
+		
 		$itemIdObject = new WbDM\Entity\ItemId( $propValue );
 		$entityObject = new WbDM\Entity\EntityIdValue( $itemIdObject );
 		
