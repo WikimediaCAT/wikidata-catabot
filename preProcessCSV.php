@@ -86,13 +86,20 @@ if ( count( $positions ) > 0 ) {
 
 	$reader = Reader::createFromPath( $csvfile );
 	
-	$reader->setOffset(1);
 	$reader->setDelimiter( $delimiter );
 	$reader->setEnclosure( $enclosure );
 	
 	$results = $reader->fetch();
+
+	$count = 0;
 	
 	foreach ( $results as $row ) {
+		
+		if ( $count === 0 ) {
+			array_push( $oresults, $row );
+			$count++;
+			continue;
+		}
 		
 		$orow = $row;
 		
@@ -101,19 +108,29 @@ if ( count( $positions ) > 0 ) {
 			// We assume pos is int
 			if ( array_key_exists( $pos, $orow ) ) {
 				
-				$orow[$pos] = resolveValue( $orow[$pos] );
+				$orow[$pos] = resolveValue( $orow[$pos], $cache, $wikiconfig );
 			}
 		}
 
 		array_push( $oresults, $orow );
 	
 	}
+	
 
 }
 
+if ( count( $argv ) > 3 ) {
+	
+	$writer = Writer::createFromPath( $argv[3], 'w+' );
+	$writer->setDelimiter( $delimiter );
+	$writer->setEnclosure( $enclosure );
+	$writer->insertAll( $oresults ); //using an array
+}
+
+
 /** Further resolve value **/
 
-function resolveValue( $rowValue ) {
+function resolveValue( $rowValue, $cache, $wikiconfig ) {
 
 	$alreadyQ = false;
 	
