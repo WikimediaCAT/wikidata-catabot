@@ -16,7 +16,6 @@ $taskname = null; // If no task given, exit
 $resolve = true; // If we allow wikipedia resolving
 $delimiter = "\t"; // Default separator
 $enclosure = "\""; // Default delimiter
-$resolveRow = false; // If we resolve row values
 
 if ( count( $argv ) > 1 ) {
 	$conffile = $argv[1];
@@ -460,8 +459,9 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 	if ( $propId && $propValue ) {
 				
 		$propIdObject = new WbDM\Entity\PropertyId( $propId );
-		$itemId = retrieveWikidataId( $propValue, $wikiconfig );
-		$itemIdObject = new WbDM\Entity\ItemId( $itemId );
+		// $itemId = retrieveWikidataId( $propValue, $wikiconfig ); -> Let's not resolve here, risky
+		// TODO: Allow more variability, also strings here. Now only Item!
+		$itemIdObject = new WbDM\Entity\ItemId( $propValue );
 		$entityObject = new WbDM\Entity\EntityIdValue( $itemIdObject );
 		
 		$statementListProp = $statementList->getByPropertyId(  $propIdObject );
@@ -653,27 +653,24 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 /** Further resolve row value from row or beyond **/
 
 function resolveRowValue( $rowValue, $row ) {
+	
+	if ( substr( $rowValue, 0, 1 ) === "$" ) {
 
-	if ( $resolveRow ) {
-	
-		if ( substr( $rowValue, 0, 1 ) === "$" ) {
-	
-			// Then its a variable
+		// Then its a variable
+		
+		if ( is_numeric( substr( $rowValue, 1 ) ) ) {
+
+			$rowNum = substr( $rowValue, 1 );
 			
-			if ( is_numeric( substr( $rowValue, 1 ) ) ) {
-	
-				$rowNum = substr( $rowValue, 1 );
+			if ( array_key_exists( intval( $rowNum ), $row ) ) {
 				
-				if ( array_key_exists( int( $rowNum ), $row ) ) {
-					
-					$rowValue = $row[int( $rowNum )];
+				$rowValue = $row[intval( $rowNum )];
 
-				}
-				
 			}
+			
 		}
-	
 	}
+	
 	
 	return $rowValue;
 	
