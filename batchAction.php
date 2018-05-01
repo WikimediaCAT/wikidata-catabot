@@ -465,10 +465,7 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 		$propIdObject = new WbDM\Entity\PropertyId( $propId );
 		// $itemId = retrieveWikidataId( $propValue, $wikiconfig ); -> Let's not resolve here, risky
 		// TODO: Allow more variability, also strings here. Now only Item!
-		
-		
-		$itemIdObject = new WbDM\Entity\ItemId( $propValue );
-		$entityObject = new WbDM\Entity\EntityIdValue( $itemIdObject );
+		$entityObject = assignValueObject( $propValue, $propValueType );
 		
 		$statementListProp = $statementList->getByPropertyId(  $propIdObject );
 		if( $statementListProp->isEmpty() ) {
@@ -654,6 +651,32 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 		
 	}
 	
+}
+
+/** Assign property value **/
+/** TODO: To put all cases **/
+
+function assignValueObject( $propValue, $propValueType ) {
+	
+	$entityObject = null;
+	
+	if ( $propValueType === "string" ) {
+		
+		$entityObject = new DataValues\StringValue( $propValue );
+		
+	} elseif ( $propValueType === "globecoordinate" ) {
+		
+		$latlong = explode( ",", $propValue ); // TODO: We assume first latitude and second longitude -> Further checking
+		$precision = floatval( "1e-8" ); // TODO: This might need to change
+		
+		$entityObject = new DataValues\Geo\Values\GlobeCoordinateValue( new DataValues\Geo\Values\LatLongValue( floatval( $latlong[0] ), floatval( $latlong[1] ) ), $precision, null  );
+		
+	} else {
+		$itemIdObject = new WbDM\Entity\ItemId( $propValue );
+		$entityObject = new WbDM\Entity\EntityIdValue( $itemIdObject );
+	}
+	
+	return $entityObject;
 }
 
 /** Further resolve row value from row or beyond **/
