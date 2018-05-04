@@ -671,6 +671,36 @@ function assignValueObject( $propValue, $propValueType ) {
 		
 		$entityObject = new DataValues\Geo\Values\GlobeCoordinateValue( new DataValues\Geo\Values\LatLongValue( floatval( $latlong[0] ), floatval( $latlong[1] ) ), $precision, null  );
 		
+	} elseif ( $propValueType === "time" ) {
+		
+		$entityObject = transformDate( $propValue );
+		
+	} elseif ( $propValueType === "number" ) {
+		if ( is_numeric( $propValue ) ) {
+			if ( (int) $propValue == $propValue ) {
+				$propValue = intval( $propValue );
+			} else {
+				$propValue = floatval( $propValue );
+
+			}
+			
+			$entityObject = new DataValues\NumberValue( $propValue );
+
+		}
+	} elseif ( $propValueType === "boolean" ) {
+	
+		if ( strtolower( $propValue ) === "true" ) {
+			$propValue = true;
+		}
+		
+		if ( strtolower( $propValue ) === "false" ) {
+			$propValue = false;
+		}
+		
+		if ( is_bool( $propValue ) ) {
+			$entityObject = new DataValues\BooleanValue( $propValue );
+		}
+
 	} else {
 		$itemIdObject = new WbDM\Entity\ItemId( $propValue );
 		$entityObject = new WbDM\Entity\EntityIdValue( $itemIdObject );
