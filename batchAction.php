@@ -408,11 +408,13 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 	
 	$propId = null;
 	$propValue = null;
-	$propValueType = "wikibase-entityid";
+	$propValueType = "wikibase-entityid"; // Default entity
 	$qualifierPropId = null;
 	$qualifierValue = null;
+	$qualifierValueType = "time"; // Default time
 	$refPropId = null;
 	$refValue = null;
+	$refValueType = "string"; // Default string
 	
 	$qualifierSnaks = null;
 	$referenceSnaks = null;
@@ -432,6 +434,9 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 	}
 	if ( array_key_exists( "qualifierValue", $props ) ){
 		$qualifierValue = resolveRowValue( $props["qualifierValue"], $row );
+	}
+	if ( array_key_exists( "qualifierValueType", $props ) ){
+		$qualifierValueType = resolveRowValue( $props["qualifierValueType"], $row );
 	}	
 	if ( array_key_exists( "ref", $props ) ){
 		$refPropId = resolveRowValue( $props["ref"], $row );
@@ -439,12 +444,15 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 	if ( array_key_exists( "refValue", $props ) ){
 		$refValue = resolveRowValue( $props["refValue"], $row );
 	}
-	
+	if ( array_key_exists( "refValueType", $props ) ){
+		$refValueType = resolveRowValue( $props["refValueType"], $row );
+	}
+
 	if ( $qualifierPropId && $qualifierValue ) {
 		// Qualifier
 		$qualifierSnaks = array(
 			// TODO: This preassumes qualifier is datetime
-			new WbDM\Snak\PropertyValueSnak( new WbDM\Entity\PropertyId( $qualifierPropId ), transformDate( $qualifierValue ) ),
+			new WbDM\Snak\PropertyValueSnak( new WbDM\Entity\PropertyId( $qualifierPropId ), assignValueObject( $qualifierValue, $qualifierValueType ) ),
 		);
 					
 	}
@@ -453,7 +461,7 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 		// Reference URL
 		$referenceSnaks = array(
 			// TODO: This preassumes reference is URL or string 
-			new WbDM\Snak\PropertyValueSnak( new WbDM\Entity\PropertyId( $refPropId ), new DataValues\StringValue( $refValue ) ),
+			new WbDM\Snak\PropertyValueSnak( new WbDM\Entity\PropertyId( $refPropId ), assignValueObject( $refValue, $refValueType ) ),
 		);
 		
 		$referenceArray = array( new WbDM\Reference( $referenceSnaks ) );
