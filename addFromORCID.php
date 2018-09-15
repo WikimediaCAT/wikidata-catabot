@@ -140,19 +140,16 @@ $opts = [
 
 $context = stream_context_create($opts);
 
-// Open the file using the HTTP headers set above
-$file = file_get_contents('http://www.example.com/', false, $context);
-
 foreach ( $researchers as $key => $value ) {
 	
 	$url = "https://pub.orcid.org/v2.1/".$key;
-	$obj = json_decode( file_get_contents( $url ), true, $context );
+	$obj = json_decode( file_get_contents( $url , true, $context ), true );
 	
 	if ( $obj ) {
 		$researchers = addORCID2array( $researchers, $obj );
 	}
 	
-	sleep( 1 );
+	sleep( 0.5 );
 
 }
 
