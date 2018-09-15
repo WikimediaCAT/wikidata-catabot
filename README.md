@@ -10,6 +10,7 @@ Bots per a utilitzar a Wikidata
 ## TODO
 
 * Refactoració. Compartir codi en funcions/classes.
+* Gestionar updates en el batch, sobretot quan no és una entitat.
 
 ### ORCID
 

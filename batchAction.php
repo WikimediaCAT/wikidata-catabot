@@ -502,7 +502,7 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 				$mainSnak = $statement->getMainSnak();
 				$datavalue = $mainSnak->getDataValue();
 				
-				if ( $datavalue->getEntityId()->getNumericId() === $itemIdObject->getNumericId() ) {
+				if ( $datavalue->getEntityId()->getNumericId() === $entityObject->getEntityId()->getNumericId() ) {
 					
 					$act = true;
 					$qualifiersExist = false;

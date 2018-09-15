@@ -1,0 +1,39 @@
+{
+	"wikipedia": {
+		"url": "https://ca.wikipedia.org/w/api.php",
+		"user": "xxx",
+		"password": "xxx"
+	},
+	"wikidata": {
+		"url": "https://www.wikidata.org/w/api.php",
+		"user": "Catabot",
+		"password": "xxx"
+	},
+	"delimiter": ",",
+	"tasks": {
+		"fosses": {
+			"desc": "Adding fosses comunes",
+			"lang": "ca",
+			"add": [
+				{
+					"prop": "P31",
+					"propValue": "Q734271"
+				},
+				{
+					"prop": "P625",
+					"propValue": "$1",
+					"propValueType": "globecoordinate"
+				},
+				{
+					"prop": "P131",
+					"propValue": "$2"
+				},
+				{
+					"prop": "P973",
+					"propValue": "$3",
+					"propValueType": "string"
+				}
+			]
+		}
+	}
+}
