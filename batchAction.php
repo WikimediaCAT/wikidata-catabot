@@ -496,13 +496,17 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 
 			$statementGuidToRemove = [];
 			
+			$foundAlready = 0;
+			
 			foreach ( $statementListProp as $statement ) {
-
+				
 				// Get Main Snak
 				$mainSnak = $statement->getMainSnak();
 				$datavalue = $mainSnak->getDataValue();
-				
+
 				if ( comparePropValue( $datavalue, $entityObject, $propValueType ) ) {
+					
+					$foundAlready++; // Already found prop-value
 					
 					$act = true;
 					$qualifiersExist = false;
@@ -637,6 +641,21 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 						}
 					}
 										
+				}
+				
+			}
+			
+			if ( $foundAlready === 0 ) {
+			
+				$mainSnak = new WbDM\Snak\PropertyValueSnak(
+					$propIdObject,
+					$entityObject
+				);
+			
+				if ( $type === "add" ) {
+					$statementList->addNewStatement( $mainSnak, $qualifierSnaks, $referenceArray );
+					echo "added statement $propId : $propValue\n";
+					return true;				
 				}
 				
 			}
