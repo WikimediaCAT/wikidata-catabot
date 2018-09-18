@@ -502,7 +502,7 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 				$mainSnak = $statement->getMainSnak();
 				$datavalue = $mainSnak->getDataValue();
 				
-				if ( $datavalue->getEntityId()->getNumericId() === $entityObject->getEntityId()->getNumericId() ) {
+				if ( comparePropValue( $datavalue, $entityObject, $propValueType ) ) {
 					
 					$act = true;
 					$qualifiersExist = false;
@@ -660,6 +660,25 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 	}
 	
 }
+
+/** Comparison function **/
+
+function comparePropValue( $datavalue, $entityObject, $propValueType ) {
+	
+	if ( $propValueType === "wikibase-entityid" ) {
+		if ( $datavalue->getEntityId()->getNumericId() === $entityObject->getEntityId()->getNumericId() ) {
+			return true;
+		}
+	} else {
+		if ( $datavalue === $entityObject ) {
+			return true;
+		}
+		
+	}
+
+	return false;
+}
+
 
 /** Assign property value **/
 /** TODO: To put all cases **/
