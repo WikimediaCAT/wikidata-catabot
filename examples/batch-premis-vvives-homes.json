@@ -1,0 +1,41 @@
+{
+	"wikipedia": {
+		"url": "https://ca.wikipedia.org/w/api.php",
+		"user": "xxx",
+		"password": "xxx"
+	},
+	"wikidata": {
+		"url": "https://www.wikidata.org/w/api.php",
+                "user": "Catabot",
+                "password": "xxx"
+	},
+	"delimiter": "\t",
+	"enclosure": "\"",
+	"resolve": true,
+	"resolveRow": false,
+	"tasks": {
+		"premis": {
+			"desc": "Adding info about Vicens Vices awardees",
+			"lang": "ca",
+			"add": [
+				{
+					"prop": "P31",
+					"propValue": "Q5"
+				},
+				{
+					"prop": "P21",
+					"propValue": "Q6581097"
+				},
+				{
+					"prop": "P166",
+					"propValue": "Q56642441",
+					"qualifier": "P585",
+					"qualifierValue": "$1",
+					"qualifierValueType": "time",
+					"ref": "P854",
+					"refValue": "http://universitatsirecerca.gencat.cat/web/.content/01_Secretaria_Universitats_i_Recerca/distincions_vicens_vives/documents/Quadre_Vicens_Vives_per_sexe.pdf"
+				}
+			]
+		}
+	}
+}
