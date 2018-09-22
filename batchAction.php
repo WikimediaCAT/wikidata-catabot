@@ -497,6 +497,8 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 			$statementGuidToRemove = [];
 			
 			$foundAlready = 0;
+			$addedQualifiers = false;
+			$addedReferences = false;
 			
 			foreach ( $statementListProp as $statement ) {
 				
@@ -533,33 +535,36 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 							
 							$qualaddcount = 0;
 							$qualcount = 0;
-							
+
 							// otherwise, add extra reference 
 							foreach ( $qualifiers as $qualifier ) {
-								
-								// Get snaks
-								$snaks = $qualifier->getSnaks();
-								
-								foreach ( $snaks as $snak ) {
 									
-									// $propertyPrev = "P".$snak->getPropertyId()->getNumericId();
-									$valuePrev = $snak->getDataValue()->getValue();
+								// $propertyPrev = "P".$snak->getPropertyId()->getNumericId();
+								$valuePrev = $qualifier->getDataValue()->getValue();
+								
+								// var_dump( $valuePrev );
+								// var_dump( $qualifierValue );
+								// TODO: Need to fix comparison
+
+								if ( $qualifierValue != $valuePrev ) {
+									$qualaddcount = $qualaddcount + 1;
+								} else {
 									
-									if ( $qualifierValue != $valuePrev ) {
-										$qualaddcount = $qualaddcount + 1;
-									} else {
-										if ( $type === "delete" ) {
-											$act = true;
-										}
+									if ( $type === "delete" ) {
+										$act = true;
 									}
-									
-									$qualcount = $qualcount + 1;
-									
 								}
+								
+								$qualcount = $qualcount + 1;
+									
+								
 								
 							}
 							
 							if ( $qualaddcount >= $qualcount ) {
+								
+								$addedQualifiers = true;
+								
 								if ( $type === "add" ) {
 									$act = true;
 								}
@@ -595,21 +600,28 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 									// $propertyPrev = "P".$snak->getPropertyId()->getNumericId();
 									$valuePrev = $snak->getDataValue()->getValue();
 									
+									// var_dump( $valuePrev );
+									// var_dump( $refValue );
+									
 									if ( $refValue != $valuePrev ) {
 										$refaddcount = $refaddcount + 1;
 									} else {
+
 										if ( $type === "delete" ) {
 											$act = true;
 										}
 									}
 									
 									$refcount = $refcount + 1;
-									
+
 								}
 								
 							}
 							
 							if ( $refaddcount >= $refcount ) {
+								
+								$addedReferences = true;
+
 								if ( $type === "add" ) {
 									$act = true;
 								}
@@ -621,12 +633,12 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 					if ( $act ) {
 						
 						if ( $type === "add" ) {
-							
-							if ( $qualifierSnaks ) {
+
+							if ( $qualifierSnaks && $addedQualifiers ) {
 								$statement->setQualifiers( new WbDM\Snak\SnakList( $qualifierSnaks ) );
 							}
 							
-							if ( $referenceSnaks ) {
+							if ( $referenceSnaks && $addedReferences ) {
 								$statement->addNewReference( $referenceSnaks );
 							
 							}

@@ -169,7 +169,7 @@ function resolveValue( $rowValue, $cache, $wikiconfig ) {
 		}
 	}
 	
-	return $rowValue;
+	return trim( $rowValue );
 	
 }
 
