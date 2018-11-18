@@ -1,6 +1,7 @@
 <?php
 
 require_once( __DIR__ . '/vendor/autoload.php' );
+require_once( __DIR__ . '/lib/resolve.php' );
 
 use \Mediawiki\Api as MwApi;
 use \Wikibase\Api as WbApi;
@@ -162,97 +163,6 @@ foreach ( $results as $row ) {
 
 $api->logout();
 
-function retrieveWikidataId( $title, $wikiconfig ){
-
-	// TODO: Handle redirect from wiki
-
-	$wdid = null;
-	
-	# If Q value
-	if ( preg_match( "/^Q\d+/", $title ) ) {
-		
-		$wdid = $title;
-		
-	} else {
-	
-		$title = str_replace( " ", "_", $title );
-		
-		// This is for getting all associated Wikidata ID
-		// $url = $wikiconfig["url"]."?action=query&prop=wbentityusage&titles=".$title."&format=json";
-		
-		// Below for main WikiData ID
-		$url = $wikiconfig["url"]."?action=query&titles=".$title."&format=json&prop=pageprops&ppprop=wikibase_item&redirects=true";
-		
-		// Process url
-		$json = file_get_contents( $url );
-	
-		// Proceess JSON
-		$obj = json_decode( $json, true );
-	
-		if ( $obj ) {
-		
-			// Below for all associated wikidata
-			//if ( array_key_exists( "query", $obj ) ) {
-			//
-			//	if ( array_key_exists( "pages", $obj['query'] ) ) {
-			//
-			//		// Assume first key
-			//		foreach ( $obj['query']["pages"] as $key => $struct ) {
-			//								
-			//			if ( array_key_exists( "wbentityusage", $struct ) ) {
-			//				
-			//				$wdid = retrieveWikidataIdfromStruct( $struct["wbentityusage"] );
-			//				
-			//			}
-			//			
-			//		}
-			//	}
-			//}
-			
-			if ( array_key_exists( "query", $obj ) ) {
-	
-				if ( array_key_exists( "pages", $obj['query'] ) ) {
-			
-					// Assume first key
-					foreach ( $obj['query']["pages"] as $key => $struct ) {
-											
-						if ( array_key_exists( "pageprops", $struct ) ) {
-							
-							if ( array_key_exists( "wikibase_item", $struct["pageprops"] ) ) {
-							
-								$wdid = $struct["pageprops"]["wikibase_item"];
-								
-								break;
-							}
-						}
-						
-					}
-				}	
-				
-			}
-		}
-	}
-	
-	return $wdid;
-}
-
-/** Unused function below **/
-function retrieveWikidataIdfromStruct( $struct ){
-	
-	$wikidataid = null;
-	
-	foreach ( $struct as $key => $hash ) {
-		
-		if ( array_key_exists( "aspects", $hash ) ) {
-					
-			if ( in_array( "O", $hash["aspects"] ) && in_array( "S", $hash["aspects"] ) ) {
-				$wikidataid = $key;
-			}
-		}	
-	}
-	
-	return $wikidataid;
-}
 
 function createItem( $wbFactory, $row, $props ) {
 	
