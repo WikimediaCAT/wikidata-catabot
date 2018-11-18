@@ -7,7 +7,8 @@
 	"wikidata": {
 		"url": "https://www.wikidata.org/w/api.php",
 		"user": "xxx",
-		"password": "xxx"
+		"password": "xxx",
+                "langs": [ "ca" ]
 	},
 	"delimiter": ",",
 	"positions": [ 2 ]

@@ -108,7 +108,7 @@ if ( count( $positions ) > 0 ) {
 			// We assume pos is int
 			if ( array_key_exists( $pos, $orow ) ) {
 				
-				$orow[$pos] = resolveValue( $orow[$pos], $cache, $wikiconfig );
+				$orow[$pos] = resolveValue( $orow[$pos], $cache, $wikiconfig, $wikidataconfig );
 			}
 		}
 
@@ -130,7 +130,7 @@ if ( count( $argv ) > 3 ) {
 
 /** Further resolve value **/
 
-function resolveValue( $rowValue, $cache, $wikiconfig ) {
+function resolveValue( $rowValue, $cache, $wikiconfig, $wikidataconfig ) {
 
 	$alreadyQ = false;
 	
@@ -157,7 +157,7 @@ function resolveValue( $rowValue, $cache, $wikiconfig ) {
 			
 		} else {
 		
-			$wdid = retrieveWikidataId( $rowValue, $wikiconfig );
+			$wdid = retrieveWikidataId( $rowValue, $wikiconfig, $wikidataconfig );
 			
 			if ( $wdid ) {
 				
@@ -175,7 +175,7 @@ function resolveValue( $rowValue, $cache, $wikiconfig ) {
 
 
 
-function retrieveWikidataId( $title, $wikiconfig ){
+function retrieveWikidataId( $title, $wikiconfig, $wikidataconfig ){
 
 	// TODO: Handle redirect from wiki
 
@@ -225,6 +225,57 @@ function retrieveWikidataId( $title, $wikiconfig ){
 				}	
 				
 			}
+		}
+		
+		// If not matches search in Wikidata
+		if ( ! $wdid ) {
+			
+			if ( $wikidataconfig["langs"] ) {
+				
+				$langs = $wikidataconfig["langs"];
+				
+				foreach ( $langs as $lang ) {
+					
+					$url = $wikidataconfig["url"]."?action=wbsearchentities&search=".$title."&format=json&language=".$lang;
+					
+					// Process url
+					$json = file_get_contents( $url );
+				
+					// Proceess JSON
+					$obj = json_decode( $json, true );
+				
+					if ( $obj ) {
+						
+						if ( array_key_exists( "search", $obj ) ) {
+						
+							$searchResults = $obj["search"];
+							if ( count( $searchResults ) > 0 ) {
+								
+								foreach ( $searchResults as $searchResult ) {
+									
+									if ( array_key_exists( "match", $searchResult ) ) {
+										
+										$typeMatch = $searchResult["match"]["type"];
+										$langMatch = $searchResult["match"]["language"];
+
+										if ( $typeMatch === "label" && $langMatch === $lang ) {
+											$wdid = $searchResult["id"];
+											
+											break;
+										}
+									}
+									
+								}
+								
+							}
+						
+						}
+						
+					}
+					
+				}
+			}
+			
 		}
 	}
 	
