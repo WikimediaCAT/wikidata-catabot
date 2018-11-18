@@ -134,7 +134,7 @@ foreach ( $results as $row ) {
 
 	// Do we resolve WikiData from Wikipedia?
 	if ( $resolve ) {	
-		$wdid = retrieveWikidataId( $row[0], $wikiconfig );
+		$wdid = retrieveWikidataId( $row[0], $wikiconfig, $wikidataconfig );
 	}
 	
 	if ( $wdid ) {
