@@ -1,0 +1,47 @@
+08100 és Gurb - no reconegut pel fuzzy
+08167 és Polinyà - no reconegut pel fuzzy
+08254 és L'Esquirol - no reconegut pel fuzzy
+08285 és Torelló - al full de càlcul surt com a Sant Feliu de Torelló
+08300 és Viladecavalls - no reconegut pel fuzzy
+17029 és Boadella i les Escaules - al full surt com a Boadella d'Empordà
+17034 és Calonge i Sant Antoni - al full surt com a Calonge de les Gavarres
+17094 és Llívia - no sortia al fitxer JSON
+17101 és Massanes - al full surt com a Maçanes
+17109 és Montagut i Oix - al full surt com a Montagut
+17122 és Palmerola - no és municipi (part de les Llosses) ni té article. L'esborrem
+17208 és la Vall de Bianya - surt bé, però el nom era Capsech Vall de Bianya
+17234 és Biure - surt com a Biure d'Empordà
+25043 és Barruera - no té municipi, però té article. Conservem
+25118 és Juncosa - surt com a Juncosa de les Garrigues
+25127 és Lles - a la wiki és Lles de Cerdanya
+25907 és Torrefeta i Florejacs - al full és Torrefló, que és un dels noms històrics
+25911 és els Plans de Sió, no sortia al JSON
+43024 és Bellvei - el fuzzy el confonia per Bellvís
+43035 és Cabacers - al full surt com a Cabassers
+43141 és Pontils - al full surt com a Santa Perpètua de Gaià, nom antic
+43169 és Vilaplana - al full surt com a Vilaplana del Camp, nom antic
+
+Manuals
+08017 és Balenyà (sortia com a Hostalets de Balenyà)
+08028 és Cabrera d'Anoia (sortia com a Cabrera d'Igualada)
+08037 és Calldetenes (sortia com a Calldetes/Sant Martí de Riudeperes)
+08082 és Fogars de la Selva (sortia com a Fogars de Tordera)
+08134 és El Figueró i Montmany (sortia com a Montmany/Figaró)
+08156 és Palau-Solità i Plegamans (sortia com Palau de Plegamans/Palau Solitar)
+08242 és Marganell (sortia com a Marganell/Santa Cecilia de Montserrat)
+08901 és Rupit i Pruit (sortia com a Pruit i Rupit)
+17162 és Sant Ferriol (sortia com a Sant Ferriol/La Parròquia de Besalú)
+17165 és Sant Jaume de Llierca (sortia com a Sant Jaume de Llierca/ Palau de Montagut)
+17185 és Sant Joan les Fonts (sortia com a Begudà)
+17187 és Saus, Camallera i Llampaies (sortia com a Saus)
+17201 és Toses (sortia com a Vall de Toses/ Toses)
+25036 és Aspa (sortia com a Aspà)
+25057 és Es Bòrdes (sortia com les Bordes, canviat)
+25121 és Les (sortia com a Lés)
+25161 és Conca de Dalt (sortia com a Pallars-Jussà, nom antic)
+25170 és Bellaguarda (sortia com a Bellaguarda/La Pobla de la Granadella
+43101 és Passanant i Belltall (sortia com a Passanant)
+43162 és Vandellòs (el nom ara és Vandellòs i l'Hospitalet de l'Infant)
+43164 és Vespella de Gaià (sortia com a Vespella, nom antic)
+43171 és Vila-Seca (sortia com a Vila-Seca i Salou)
+43176 és Vimbodí i Poblet (sortia com a Vimbodí)
