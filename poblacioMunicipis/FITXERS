@@ -1,0 +1,5 @@
+Al directori dades:
+- 'Poblaci¢ de fet.xls' - El full de càlcul original, baixat de http://ced.uab.cat/catalonia/evolucio/Poblacio%20de%20fet.zip, des de l'enllaç trobat a http://ced.uab.es/infraestructures/banc-de-dades-espanya-i-catalunya/evolucio-i-continuitat-dels-municipis-catalans-1497-2002/
+- dades.csv - Les dades a actualitzar, extretes del full anterior en format CSV
+- municipis.csv - La taula de municipis a utilitzar amb dades.csv, extreta també del full de càlcul.
+- municipis_cac.json - Correspondència entre els municipis de la Comunitat Autònoma de Catalunya i el seu item de Wikidata.
