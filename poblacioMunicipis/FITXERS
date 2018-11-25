@@ -3,3 +3,12 @@ Al directori dades:
 - dades.csv - Les dades a actualitzar, extretes del full anterior en format CSV
 - municipis.csv - La taula de municipis a utilitzar amb dades.csv, extreta també del full de càlcul.
 - municipis_cac.json - Correspondència entre els municipis de la Comunitat Autònoma de Catalunya i el seu item de Wikidata.
+
+Codi:
+- tractar_fitxers.py - Genera la llista de municipis-items necessària per actualitzar Wikidata.
+  Com que no tots els noms de municipi concorden, s'ha de repasar a mà.
+  Genera dos fitxers: municipis_q.csv i municipis_manual.csv. Tots dos s'han
+  de repassar a mà; un pels fuzzies i l'altre per trobar la Q a mà.
+- municipis.in - Resultat d'editar els fitxers generats abans, decidir si els
+  fuzzies són correctes, i afegir els manuals. Serà l'entrada per actualitzar
+  Wikidata
