@@ -157,6 +157,9 @@ def main():
        # Ara ja tenim seleccionat a Wikidata el municipi i sabem quins
        # anys ja tenen informació. Omplim la resta
 
+       if poblacio == '0':
+          print "La poblacio de l'any",any_cens,u" és 0"
+          continue
        # Si l'any que llegim ja és a Wikidata, saltem la dada
        if any_cens in anys_omplerts:
           print "L'any ",any_cens,u"ja és a wikidata"
