@@ -24,7 +24,11 @@ class WDint:
       lrefs=[urldelaref]
 
       # Ara, la data, amb precisió d'any
-      datainfo = pywikibot.WbTime(year=any_cens,precision='year')
+      if any_cens<= 1582:
+          calendari='http://www.wikidata.org/entity/Q1985786'   # julià
+      else:
+          calendari='http://www.wikidata.org/entity/Q1985727'   # gregorià
+      datainfo = pywikibot.WbTime(year=any_cens,precision='year',calendarmodel=calendari)
       qualif = pywikibot.Claim(self.repowd,'P585')
       qualif.setTarget(datainfo)
 
@@ -38,11 +42,11 @@ class WDint:
       pob_clm.addQualifier(qualif2)
       pob_clm.addSources(lrefs)
 
-    def wd_anys_amb_poblacio(self):
+    def wd_anys_amb_poblacio(self,propietat):
       toret = set()
       # això ho retornarem al final
-      for p in ['P1082','P1538']:       # fem el mateix per les dues propietats
-        if p in self.item.claims:
+      p = propietat
+      if p in self.item.claims:
           llista = self.item.claims[p]
           for censos in llista:
              tg = censos.getTarget()
@@ -87,8 +91,8 @@ class WDint:
     # Ja fan l'item.get perquè així la resta ja poden accedir al contingut
     # de l'item
     def wd_item_des_de_q(self, q):
-       # proves amb sandbox
-       q = 'Q4115189'
+       # descomentar si es fan proves amb sandbox
+       # q = 'Q4115189'
        try:
            self.item = pywikibot.ItemPage(self.wdsite,q)
        except:
@@ -152,17 +156,15 @@ def main():
             print "No trobem la Q del municipi "+municipi+" de l'Excel"
             return
           item_muni = wd.wd_item_des_de_q(q)
-          anys_omplerts = wd.wd_anys_amb_poblacio()
-          print anys_omplerts
+          # fem el mateix per les dues propietats
+          anys_omplerts_pob = wd.wd_anys_amb_poblacio('P1082')
+          anys_omplerts_fog = wd.wd_anys_amb_poblacio('P1538')
+          #print anys_omplerts_pob, anys_omplerts_fog
        # Ara ja tenim seleccionat a Wikidata el municipi i sabem quins
        # anys ja tenen informació. Omplim la resta
 
        if poblacio == '0':
           print "La poblacio de l'any",any_cens,u" és 0"
-          continue
-       # Si l'any que llegim ja és a Wikidata, saltem la dada
-       if any_cens in anys_omplerts:
-          print "L'any ",any_cens,u"ja és a wikidata"
           continue
 
         # Per anys < 1700, el que tenim són fogatges (P1538 = nombre de llars)
@@ -171,6 +173,14 @@ def main():
          propietat = 'P1538'
        else:
          propietat = 'P1082'
+
+       # Si l'any que llegim ja és a Wikidata, saltem la dada
+       if any_cens > 1700 and any_cens in anys_omplerts_pob:
+          print "L'any ",any_cens,u"ja és a wikidata"
+          continue
+       if any_cens <= 1700 and any_cens in anys_omplerts_fog:
+          print "L'any ",any_cens,u"ja és a wikidata"
+          continue
 
        wd.wd_actualitzar_pob(propietat,poblacio,any_cens)
 
