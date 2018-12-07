@@ -104,7 +104,7 @@ class WDint:
                    lng_any = data_info.year
                    toret.add(lng_any)    # anem omplint el conjunt
                  if ndates != 1:
-                   print "Atenció, dades de població sense any o amb massa anys a ",self.item.labels['ca']
+                   print "Atenció, dades de població sense any o amb massa anys a ".encode("utf-8"),self.item.labels['ca']
       return toret
 
     def wd_comprovar_municipi(self):
@@ -125,7 +125,7 @@ class WDint:
               muniesp = True
 
       if not municat or muniesp:
-        print u"Atenció, "+self.item.labels['ca']+" ("+self.item.id+u") té anomalia a la P31"
+        print u"Atenció, ".encode("utf-8")+self.item.labels['ca']+" ("+self.item.id+u") té anomalia a la P31".encode("utf-8")
 
     def wd_posar_preferit(self,propietat):
        if propietat in self.item.claims:
@@ -238,7 +238,7 @@ def main():
             return
           item_muni = wd.wd_item_des_de_q(q)
           nom_muni = wd.wd_nom_municipi()
-          print nom_muni
+          print nom_muni.encode("utf-8")
           # fem el mateix per les dues propietats per no matxacar info
           anys_omplerts_pob = wd.wd_anys_amb_poblacio('P1082')
           anys_omplerts_fog = wd.wd_anys_amb_poblacio('P1538')
@@ -247,7 +247,7 @@ def main():
        # anys ja tenen informació. Omplim la resta
 
        if poblacio == '0':
-          print "La poblacio de l'any",any_cens,"a ",nom_muni,u" és 0"
+          print "La poblacio de l'any",any_cens,"a ",nom_muni,u" és 0".encode("utf-8")
           continue
 
         # Per anys < 1700, el que tenim són fogatges (P1538 = nombre de llars)
@@ -276,10 +276,10 @@ def main():
 
        # Si l'any que llegim ja és a Wikidata, saltem la dada
        if any_cens > 1700 and any_cens in anys_omplerts_pob:
-          print "L'any ",any_cens,"a ",nom_muni,u"ja és a wikidata"
+          print "L'any ",any_cens,"a ",nom_muni,u"ja és a wikidata".encode("utf-8")
           continue
        if any_cens <= 1700 and any_cens in anys_omplerts_fog:
-          print "L'any ",any_cens,"a ",nom_muni,u"ja és a wikidata"
+          print "L'any ",any_cens,"a ",nom_muni,u"ja és a wikidata".encode("utf-8")
           continue
 
        wd.wd_actualitzar_pob(propietat,poblacio,any_cens)
