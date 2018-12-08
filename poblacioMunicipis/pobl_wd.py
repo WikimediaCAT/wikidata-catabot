@@ -247,7 +247,7 @@ def main():
        # anys ja tenen informació. Omplim la resta
 
        if poblacio == '0':
-          print "La poblacio de l'any",any_cens,"a ",nom_muni,u" és 0".encode("utf-8")
+          print "La poblacio de l'any".encode("utf-8"),any_cens,"a ",nom_muni.encode("utf-8"),u" és 0".encode("utf-8")
           continue
 
         # Per anys < 1700, el que tenim són fogatges (P1538 = nombre de llars)
@@ -276,10 +276,10 @@ def main():
 
        # Si l'any que llegim ja és a Wikidata, saltem la dada
        if any_cens > 1700 and any_cens in anys_omplerts_pob:
-          print "L'any ",any_cens,"a ",nom_muni,u"ja és a wikidata".encode("utf-8")
+          print "L'any ",any_cens,"a ",nom_muni.encode("utf-8"),u"ja és a wikidata".encode("utf-8")
           continue
        if any_cens <= 1700 and any_cens in anys_omplerts_fog:
-          print "L'any ",any_cens,"a ",nom_muni,u"ja és a wikidata".encode("utf-8")
+          print "L'any ",any_cens,"a ",nom_muni.encode("utf-8"),u"ja és a wikidata".encode("utf-8")
           continue
 
        wd.wd_actualitzar_pob(propietat,poblacio,any_cens)
