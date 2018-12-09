@@ -226,7 +226,7 @@ def main():
            continue
        municipi = fila[2]
        any_cens = int(fila[3])
-       poblacio = fila[4]
+       pob_str  = fila[4]
     
        if municipi != muni_ant:     # Canvi de municipi, cal llegir la Q
           muni_ant = municipi
@@ -246,7 +246,11 @@ def main():
        # Ara ja tenim seleccionat a Wikidata el municipi i sabem quins
        # anys ja tenen informació. Omplim la resta
 
-       if poblacio == '0':
+       try:
+          poblacio = int(pob_str)
+       except:
+          poblacio = 0
+       if poblacio == 0:
           print "La poblacio de l'any".encode("utf-8"),any_cens,"a ",nom_muni.encode("utf-8"),u" és 0".encode("utf-8")
           continue
 
