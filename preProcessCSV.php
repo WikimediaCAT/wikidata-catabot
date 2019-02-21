@@ -18,6 +18,9 @@ $csvfile = 'list.csv';
 $delimiter = "\t"; // Default separator
 $enclosure = "\""; // Default delimiter
 $positions = array(); // Resolve positions
+$dpositions = array(); // Resolve date positions
+$dschema = array(); // Resolve date positions
+$dschemaout = array(); // Resolve date positions
 
 if ( count( $argv ) > 1 ) {
 	$conffile = $argv[1];
@@ -56,6 +59,18 @@ if ( array_key_exists( "enclosure", $confjson ) ) {
 
 if ( array_key_exists( "positions", $confjson ) ) {
 	$positions = $confjson["positions"];
+}
+
+if ( array_key_exists( "dpositions", $confjson ) ) {
+	$dpositions = $confjson["dpositions"];
+}
+
+if ( array_key_exists( "dschema", $confjson ) ) {
+	$dschema = $confjson["dschema"];
+}
+
+if ( array_key_exists( "dschemaout", $confjson ) ) {
+	$dschemaout = $confjson["dschemaout"];
 }
 
 $api = new MwApi\MediawikiApi( $wikidataconfig['url'] );
@@ -114,6 +129,28 @@ if ( count( $positions ) > 0 ) {
 			}
 		}
 
+		foreach ( $dpositions as $dpos ) {
+						
+			// We assume pos is int
+			if ( array_key_exists( $dpos, $orow ) ) {
+				
+				$schema = null;
+				$schemaout = null;
+				
+				if ( $dschema && $dschema[ $dpos ] ) {
+					$schema = $dschema[ $dpos ];
+				}
+				
+				if ( $dschemaout && $dschemaout[ $dpos ] ) {
+					$schemaout = $dschemaout[ $dpos ];
+				}
+
+				$orow[$dpos] = resolveDate( $orow[$dpos], $schema, $schemaout );
+				
+			}
+		}
+
+		
 		array_push( $oresults, $orow );
 	
 	}

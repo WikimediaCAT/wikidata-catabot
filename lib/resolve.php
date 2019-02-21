@@ -45,6 +45,25 @@ function resolveValue( $rowValue, $cache, $wikiconfig, $wikidataconfig ) {
 	
 }
 
+function resolveDate( $rowValue, $schema, $schemaout ) {
+	
+	if ( ! $schema ) {
+		$schema = "d-m-Y";
+	}
+	
+	if ( ! $schemaout ) {
+		$schemaout="Y-m-d";
+	}
+	
+	$date = DateTime::createFromFormat( $schema, $rowValue );
+
+	if ( $date ) {
+		return date_format( $date, $schemaout );
+	} else {
+		return $rowValue;
+	}
+}
+
 
 
 function retrieveWikidataId( $title, $wikiconfig, $wikidataconfig ){
