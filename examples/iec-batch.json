@@ -21,25 +21,25 @@
 				},
 				{
 					"prop": "P569",
-					"propValue": "$1",
+					"propValue": "$5",
 					"propValueType": "time",
 					"ref": "P854",
-					"refValue": "$4"
+					"refValue": "$13"
 				},
 				{
 					"prop": "P19",
-					"propValue": "$1",
+					"propValue": "$4",
 					"ref": "P854",
-					"refValue": "$4"
+					"refValue": "$13"
 				},
 				{
 					"prop": "P463",
-					"propValue": "$1",
+					"propValue": "$9",
 					"qualifier": "P580",
-					"qualifierValue": "$1",
+					"qualifierValue": "$11",
 					"qualifierValueType": "time",
 					"ref": "P854",
-					"refValue": "$4"
+					"refValue": "$13"
 				}
 			]
 		}
