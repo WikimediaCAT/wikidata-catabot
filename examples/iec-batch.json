@@ -1,0 +1,47 @@
+{
+	"wikipedia": {
+		"url": "https://ca.wikipedia.org/w/api.php",
+		"user": "xxx",
+		"password": "xxx"
+	},
+	"wikidata": {
+		"url": "https://www.wikidata.org/w/api.php",
+		"user": "Catabot",
+		"password": "xxx"
+	},
+	"delimiter": "\t",
+	"tasks": {
+		"newiec": {
+			"desc": "Adding new IEC members",
+			"lang": "ca",
+			"add": [
+				{
+					"prop": "P31",
+					"propValue": "Q5"
+				},
+				{
+					"prop": "P569",
+					"propValue": "$1",
+					"propValueType": "time",
+					"ref": "P854",
+					"refValue": "$4"
+				},
+				{
+					"prop": "P19",
+					"propValue": "$1",
+					"ref": "P854",
+					"refValue": "$4"
+				},
+				{
+					"prop": "P463",
+					"propValue": "$1",
+					"qualifier": "P580",
+					"qualifierValue": "$1",
+					"qualifierValueType": "time",
+					"ref": "P854",
+					"refValue": "$4"
+				}
+			]
+		}
+	}
+}
