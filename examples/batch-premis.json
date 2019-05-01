@@ -1,0 +1,33 @@
+{
+	"wikipedia": {
+		"url": "https://ca.wikipedia.org/w/api.php",
+		"user": "xxx",
+		"password": "xxx"
+	},
+	"wikidata": {
+		"url": "https://www.wikidata.org/w/api.php",
+                "user": "Catabot",
+                "password": "xxx"
+	},
+	"delimiter": "\t",
+	"enclosure": "\"",
+	"resolve": true,
+	"resolveRow": false,
+	"tasks": {
+		"premis": {
+			"desc": "Adding info about premis",
+			"lang": "ca",
+			"add": [
+				{
+					"prop": "P166",
+					"propValue": "$1",
+					"qualifier": "P585",
+					"qualifierValue": "$2",
+					"qualifierValueType": "time",
+					"ref": "P854",
+					"refValue": "$3"
+				}
+			]
+		}
+	}
+}

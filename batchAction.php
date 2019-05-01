@@ -358,6 +358,7 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 		$refValueType = resolveRowValue( $props["refValueType"], $row );
 	}
 
+	echo "@".$propId." :: ".$propValue. "---".$propValueType."\n";
 	if ( $qualifierPropId && $qualifierValue ) {
 		// Qualifier
 		$qualifierSnaks = array(
@@ -627,7 +628,7 @@ function comparePropValue( $datavalue, $entityObject, $propValueType ) {
 function assignValueObject( $propValue, $propValueType ) {
 	
 	$entityObject = null;
-	
+	echo "** ".$propValue." -- ".$propValueType."\n";	
 	if ( $propValueType === "string" ) {
 		
 		$entityObject = new DataValues\StringValue( $propValue );
@@ -640,7 +641,6 @@ function assignValueObject( $propValue, $propValueType ) {
 		$entityObject = new DataValues\Geo\Values\GlobeCoordinateValue( new DataValues\Geo\Values\LatLongValue( floatval( $latlong[0] ), floatval( $latlong[1] ) ), $precision, null  );
 		
 	} elseif ( $propValueType === "time" ) {
-		
 		$entityObject = transformDate( $propValue );
 		
 	} elseif ( $propValueType === "number" ) {
