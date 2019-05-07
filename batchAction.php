@@ -361,12 +361,42 @@ function performActionPerId( $wbFactory, $id, $row, $props, $statementList, $wik
 	echo "@".$propId." :: ".$propValue. "---".$propValueType."\n";
 	if ( $qualifierPropId && $qualifierValue ) {
 		// Qualifier
-		$qualifierSnaks = array(
-			// TODO: This preassumes qualifier is datetime
-			new WbDM\Snak\PropertyValueSnak( new WbDM\Entity\PropertyId( $qualifierPropId ), assignValueObject( $qualifierValue, $qualifierValueType ) ),
-		);
+		$qualifierSnaks = array();
+		$qualifierSnak = new WbDM\Snak\PropertyValueSnak( new WbDM\Entity\PropertyId( $qualifierPropId ), assignValueObject( $qualifierValue, $qualifierValueType ) );
+		array_push( $qualifierSnaks, $qualifierSnak );
 					
 	}
+	
+	// Lets handle qualifiers array
+	if ( array_key_exists( "qualifiers", $props ) ){
+
+		$qualifierSnaks = array();
+
+		foreach ( $props["qualifiers"] as $qualifier ) {
+
+			$qualifierPropId = null;
+			$qualifierValue = null;
+			$qualifierValueType = "time"; // Default time
+	
+			if ( array_key_exists( "qualifier", $qualifier ) ){
+				$qualifierPropId = resolveRowValue( $qualifier["qualifier"], $row );
+			}
+			if ( array_key_exists( "qualifierValue", $qualifier ) ){
+				$qualifierValue = resolveRowValue( $qualifier["qualifierValue"], $row );
+			}
+			if ( array_key_exists( "qualifierValueType", $qualifier ) ){
+				$qualifierValueType = resolveRowValue( $qualifier["qualifierValueType"], $row );
+			}
+			
+			if ( $qualifierPropId && $qualifierValue ) {
+	
+				$qualifierSnak = new WbDM\Snak\PropertyValueSnak( new WbDM\Entity\PropertyId( $qualifierPropId ), assignValueObject( $qualifierValue, $qualifierValueType ) );
+				array_push( $qualifierSnaks, $qualifierSnak );
+			
+			}		
+		}
+	}
+	
 	
 	if ( $refPropId && $refValue ) {
 		// Reference URL
