@@ -2,6 +2,7 @@
 
 require_once( __DIR__ . '/vendor/autoload.php' );
 require_once( __DIR__ . '/lib/resolve.php' );
+require_once( __DIR__ . '/lib/action.php' );
 
 use \Mediawiki\Api as MwApi;
 use \Wikibase\Api as WbApi;
