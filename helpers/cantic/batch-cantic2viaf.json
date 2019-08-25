@@ -1,0 +1,28 @@
+{
+	"wikipedia": {
+		"url": "https://ca.wikipedia.org/w/api.php",
+		"user": "xxx",
+		"password": "xxx"
+	},
+	"wikidata": {
+		"url": "https://www.wikidata.org/w/api.php",
+                "user": "Catabot",
+                "password": "xxx"
+	},
+	"delimiter": ",",
+	"enclosure": "\"",
+	"resolve": true,
+	"resolveRow": false,
+	"tasks": {
+		"cantic2viaf": {
+			"desc": "Adding VIAF from CANTIC",
+			"lang": "ca",
+			"add": [
+				{
+					"prop": "P214",
+					"propValue": "$3"
+				}
+			]
+		}
+	}
+}
