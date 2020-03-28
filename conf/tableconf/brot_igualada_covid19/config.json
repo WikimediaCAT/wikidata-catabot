@@ -1,0 +1,19 @@
+{
+	"wikipedia": {
+		"url": "https://ca.wikipedia.org/w/api.php",
+		"user": "xxx",
+		"password": "xxx"
+	},
+	"wikidata": {
+		"url": "https://www.wikidata.org/w/api.php",
+		"user": "Catabot",
+		"password": "xxx"
+	},
+	"delimiter": ",",
+	"enclosure": "\"",
+	"starttag": "<!-- inici taula -->",
+	"endtag": "<!--final taula-->",
+	"header": "<center>",
+	"footer": "</center><small>Font: [[Departament de Salut de la Generalitat de Catalunya]]</small></center>",
+	"page": "Brot de coronavirus a la Conca d'Òdena el 2020"
+}
