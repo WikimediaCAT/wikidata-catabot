@@ -83,13 +83,10 @@ $contentTxt = getPageContent( $wpapi, $props["page"] );
 if ( $contentTxt ) {
 
 	$contentTxt = replaceContent( $contentTxt, $string, $props );
-	echo $contentTxt;
 
-//	putPage( $wpapi, $contentTxt, $props["page"] ); 
+	putPage( $wpapi, $contentTxt, $props["page"] ); 
 
 }
-
-#print $string;
 
 $wpapi->logout();
 
@@ -192,5 +189,22 @@ function replaceContent( $contentTxt, $string, $props ) {
 
 function putPage( $wpapi, $contentTxt, $page ) {
 	
+	$params = array( "meta" => "tokens" );
+	$getToken = new Mwapi\SimpleRequest( 'query', $params  );
+	$outcome = $wpapi->postRequest( $getToken );
+	$summary = "Actualitza Catabot";
+	
+	if ( array_key_exists( "query", $outcome ) ) {
+		if ( array_key_exists( "tokens", $outcome["query"] ) ) {
+			if ( array_key_exists( "csrftoken", $outcome["query"]["tokens"] ) ) {
+				
+				$token = $outcome["query"]["tokens"]["csrftoken"];
+				$params = array( "title" => $page, "summary" => $summary, "text" => $contentTxt, "token" => $token );
+				$sendText = new Mwapi\SimpleRequest( 'edit', $params  );
+				$outcome = $wpapi->postRequest( $sendText );			
+			
+			}				
+		}
+	}
 	
 }
