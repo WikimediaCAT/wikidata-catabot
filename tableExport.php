@@ -204,7 +204,6 @@ function replaceContent( $contentTxt, $string, $props ) {
 		}
 		
 		if ( strpos ( $line, $props["endtag"] )  !== false ) {
-			echo $line."\n";
 			$out = 0;
 			$post = 1;
 			$pre = 0;
