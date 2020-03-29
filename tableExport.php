@@ -106,7 +106,9 @@ function processRow( $row, $types ) {
 		if ( array_key_exists( $c, $types ) ) {
 			if ( $types[$c] == "int" ) {
 				
-				$el = intval( $el );
+				if ( $el !== "" ) {
+					$el = intval( $el );
+				}
 			}
 		}
 		
