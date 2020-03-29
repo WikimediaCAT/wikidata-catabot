@@ -6,6 +6,7 @@
 	},
 	"delimiter": ",",
 	"enclosure": "\"",
+	"types": [ "string", "int", "int" ],
 	"starttag": "<!-- inici taula -->",
 	"endtag": "<!-- final taula -->",
 	"header": "<center>\n",

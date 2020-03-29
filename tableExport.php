@@ -65,7 +65,7 @@ foreach ( $results as $row ) {
 	}
 	if ( count( $row ) > 0 ) {
 		
-		if ( array_key_exists( "types", $props ) ) {
+		if ( array_key_exists( "types", $props ) && $rowi > 0 ) {
 			$row = processRow( $row, $props["types"] );
 		}
 		
