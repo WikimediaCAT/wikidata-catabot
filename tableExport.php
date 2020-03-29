@@ -64,6 +64,11 @@ foreach ( $results as $row ) {
 		$si = "{| class=\"wikitable sortable\"\n! ";
 	}
 	if ( count( $row ) > 0 ) {
+		
+		if ( array_key_exists( "types", $props ) ) {
+			$row = processRow( $row, $props["types"] );
+		}
+		
 		$string.= $si.implode( $ss, $row )."\n";
 	}
 	
@@ -90,6 +95,28 @@ if ( $contentTxt ) {
 
 $wpapi->logout();
 
+function processRow( $row, $types ) {
+	
+	$newRow = [];
+	
+	$c = 0;
+	
+	foreach ( $row as $el ) {
+	
+		if ( array_key_exists( $c, $types ) ) {
+			if ( $types[$c] == "int" ) {
+				
+				$el = intval( $el );
+			}
+		}
+		
+		$c++;
+		
+		array_push( $newRow, $el ); 
+	}
+	
+	return $newRow;
+}
 
 function getPageContent( $wpapi, $page ) {
 
