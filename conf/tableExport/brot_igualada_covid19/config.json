@@ -7,8 +7,8 @@
 	"delimiter": ",",
 	"enclosure": "\"",
 	"starttag": "<!-- inici taula -->",
-	"endtag": "<!--final taula-->",
-	"header": "<center>",
-	"footer": "<small>Font: [[Departament de Salut de la Generalitat de Catalunya]]</small></center>",
+	"endtag": "<!-- final taula -->",
+	"header": "<center>\n",
+	"footer": "<small>Font: [[Departament de Salut de la Generalitat de Catalunya]]</small>\n</center>",
 	"page": "Brot de coronavirus a la Conca d'Òdena el 2020"
 }

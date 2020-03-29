@@ -61,8 +61,7 @@ foreach ( $results as $row ) {
 	$ss = " || ";
 	
 	if ( $rowi == 0 ) {
-		$si = "{| class='wikitable sortable'\n|-\n! ";
-		$ss = " !! ";
+		$si = "{| class=\"wikitable sortable\"\n! ";
 	}
 	if ( count( $row ) > 0 ) {
 		$string.= $si.implode( $ss, $row )."\n";
@@ -84,6 +83,7 @@ if ( $contentTxt ) {
 
 	$contentTxt = replaceContent( $contentTxt, $string, $props );
 
+	// echo $contentTxt, "\n";
 	putPage( $wpapi, $contentTxt, $props["page"] ); 
 
 }
@@ -168,21 +168,23 @@ function replaceContent( $contentTxt, $string, $props ) {
 		}
 		
 		if ( $out == 0 && $pre == 0 ) {
-			array_push( $preArr, $line );
-		}
-
-		if ( $out == 0 && $post == 1 ) {
-			array_push( $postArr, $line );
+			
+			if ( $post == 0 ) {
+				array_push( $preArr, $line );
+			} else {
+				array_push( $postArr, $line );
+			}
 		}
 		
 		if ( strpos ( $line, $props["endtag"] )  !== false ) {
 			echo $line."\n";
 			$out = 0;
 			$post = 1;
+			$pre = 0;
 		}
 	}
 	
-	return implode( "\n", $preArr ). "\n". $props["starttag"]. $string . $props["endtag"] . implode( "\n", $postArr );
+	return implode( "\n", $preArr ). "\n". $props["starttag"]. "\n" . $string . "\n" . $props["endtag"] . "\n" . implode( "\n", $postArr );
 
 
 }
