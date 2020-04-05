@@ -18,6 +18,7 @@ $taskname = null; // If no task given, exit
 $resolve = true; // If we allow wikipedia resolving
 $delimiter = "\t"; // Default separator
 $enclosure = "\""; // Default delimiter
+$offset = 1; // Default offset
 
 if ( count( $argv ) > 1 ) {
 	$conffile = $argv[1];
@@ -65,6 +66,9 @@ if ( array_key_exists( "enclosure", $confjson ) ) {
 	$enclosure = $confjson["enclosure"];
 }
 
+if ( array_key_exists( "offset", $confjson ) ) {
+	$offset = $confjson["offset"];
+}
 
 $tasks = array_keys( $tasksConf );
 $props = null;
@@ -110,7 +114,7 @@ $wbFactory = new WbApi\WikibaseFactory(
 
 $reader = Reader::createFromPath( $csvfile );
 
-$reader->setOffset(1);
+$reader->setOffset($offset);
 $reader->setDelimiter( $delimiter );
 $reader->setEnclosure( $enclosure );
 
