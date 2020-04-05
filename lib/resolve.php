@@ -68,8 +68,6 @@ function resolveDate( $rowValue, $schema, $schemaout ) {
 
 function retrieveWikidataId( $title, $wikiconfig, $wikidataconfig ){
 
-	// TODO: Handle redirect from wiki
-
 	$wdid = null;
 	
 	# If Q value
@@ -79,12 +77,15 @@ function retrieveWikidataId( $title, $wikiconfig, $wikidataconfig ){
 		
 	} else {
 	
+		sleep( 5 );
+
 		$title = str_replace( " ", "_", $title );
 		
 		// This is for getting all associated Wikidata ID
 		// $url = $wikiconfig["url"]."?action=query&prop=wbentityusage&titles=".$title."&format=json";
 		
 		// Below for main WikiData ID
+		// TODO: Adding retry
 		$url = $wikiconfig["url"]."?action=query&titles=".$title."&format=json&prop=pageprops&ppprop=wikibase_item&redirects=true";
 		
 		// Process url
@@ -129,6 +130,7 @@ function retrieveWikidataId( $title, $wikiconfig, $wikidataconfig ){
 				
 				foreach ( $langs as $lang ) {
 					
+					// TODO: Adding retry
 					$url = $wikidataconfig["url"]."?action=wbsearchentities&search=".$title."&format=json&language=".$lang;
 					
 					// Process url
