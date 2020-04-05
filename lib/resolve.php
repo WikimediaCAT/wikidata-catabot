@@ -77,59 +77,62 @@ function retrieveWikidataId( $title, $wikiconfig, $wikidataconfig ){
 		
 	} else {
 	
-		sleep( 5 );
-
-		$title = str_replace( " ", "_", $title );
-		
-		// This is for getting all associated Wikidata ID
-		// $url = $wikiconfig["url"]."?action=query&prop=wbentityusage&titles=".$title."&format=json";
-		
-		// Below for main WikiData ID
-		// TODO: Adding retry -> 400 bad request
-		$url = $wikiconfig["url"]."?action=query&titles=".$title."&format=json&prop=pageprops&ppprop=wikibase_item&redirects=true";
-		
-		// Process url
-		$json = file_get_contents( $url );
+		if ( $wikiconfig ) {
 	
-		// Proceess JSON
-		$obj = json_decode( $json, true );
+			sleep( 5 );
 	
-		if ( $obj ) {
+			$title = str_replace( " ", "_", $title );
 			
-			if ( array_key_exists( "query", $obj ) ) {
-	
-				if ( array_key_exists( "pages", $obj['query'] ) ) {
+			// This is for getting all associated Wikidata ID
+			// $url = $wikiconfig["url"]."?action=query&prop=wbentityusage&titles=".$title."&format=json";
 			
-					// Assume first key
-					foreach ( $obj['query']["pages"] as $key => $struct ) {
-											
-						if ( array_key_exists( "pageprops", $struct ) ) {
-							
-							if ( array_key_exists( "wikibase_item", $struct["pageprops"] ) ) {
-							
-								$wdid = $struct["pageprops"]["wikibase_item"];
-								
-								break;
-							}
-						}
-						
-					}
-				}	
+			// Below for main WikiData ID
+			// TODO: Adding retry -> 400 bad request
+			$url = $wikiconfig["url"]."?action=query&titles=".$title."&format=json&prop=pageprops&ppprop=wikibase_item&redirects=true";
+			
+			// Process url
+			$json = file_get_contents( $url );
+		
+			// Proceess JSON
+			$obj = json_decode( $json, true );
+		
+			if ( $obj ) {
 				
+				if ( array_key_exists( "query", $obj ) ) {
+		
+					if ( array_key_exists( "pages", $obj['query'] ) ) {
+				
+						// Assume first key
+						foreach ( $obj['query']["pages"] as $key => $struct ) {
+												
+							if ( array_key_exists( "pageprops", $struct ) ) {
+								
+								if ( array_key_exists( "wikibase_item", $struct["pageprops"] ) ) {
+								
+									$wdid = $struct["pageprops"]["wikibase_item"];
+									
+									break;
+								}
+							}
+							
+						}
+					}	
+					
+				}
 			}
 		}
 		
 		// If not matches search in Wikidata
 		if ( ! $wdid ) {
 			
-			sleep( 5 );
-
-			if ( $wikidataconfig["langs"] ) {
+			if ( $wikidataconfig && array_key_exists( "langs", $wikidataconfig ) ) {
 				
 				$langs = $wikidataconfig["langs"];
 				
 				foreach ( $langs as $lang ) {
 					
+					sleep( 2 );
+
 					// TODO: Adding retry -> 400 bad request
 					$url = $wikidataconfig["url"]."?action=wbsearchentities&search=".$title."&format=json&language=".$lang;
 					
