@@ -121,6 +121,8 @@ function retrieveWikidataId( $title, $wikiconfig, $wikidataconfig ){
 		// If not matches search in Wikidata
 		if ( ! $wdid ) {
 			
+			sleep( 5 );
+
 			if ( $wikidataconfig["langs"] ) {
 				
 				$langs = $wikidataconfig["langs"];

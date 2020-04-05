@@ -140,6 +140,7 @@ foreach ( $results as $row ) {
 	// Do we resolve WikiData from Wikipedia?
 	if ( $resolve ) {	
 		$wdid = retrieveWikidataId( $row[0], $wikiconfig, $wikidataconfig );
+		sleep( 5 );
 	}
 	
 	if ( $wdid ) {
@@ -147,6 +148,7 @@ foreach ( $results as $row ) {
 		// Add statement and ref
 		echo $wdid."\n"; // Only considers id -> ACTION done via configuration
 		performAction( $wbFactory, $wdid, $row, $props, $wikiconfig );
+		performHeaderAction( $wbFactory, $wdid, $row, $props );
 		sleep( 5 ); // Delay 5 seconds
 	} else {
 		

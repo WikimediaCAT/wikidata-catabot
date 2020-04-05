@@ -21,6 +21,7 @@ $positions = array(); // Resolve positions
 $dpositions = array(); // Resolve date positions
 $dschema = array(); // Resolve date positions
 $dschemaout = array(); // Resolve date positions
+$offset = 1;
 
 if ( count( $argv ) > 1 ) {
 	$conffile = $argv[1];
@@ -73,6 +74,10 @@ if ( array_key_exists( "dschemaout", $confjson ) ) {
 	$dschemaout = $confjson["dschemaout"];
 }
 
+if ( array_key_exists( "offset", $confjson ) ) {
+	$offset = $confjson["offset"];
+}
+
 $api = new MwApi\MediawikiApi( $wikidataconfig['url'] );
 
 $api->login( new MwApi\ApiUser( $wikidataconfig['user'], $wikidataconfig['password'] ) );
@@ -103,6 +108,7 @@ if ( count( $positions ) > 0 ) {
 
 	$reader = Reader::createFromPath( $csvfile );
 	
+	$reader->setOffset($offset);
 	$reader->setDelimiter( $delimiter );
 	$reader->setEnclosure( $enclosure );
 	
@@ -111,12 +117,6 @@ if ( count( $positions ) > 0 ) {
 	$count = 0;
 	
 	foreach ( $results as $row ) {
-		
-		if ( $count === 0 ) {
-			array_push( $oresults, $row );
-			$count++;
-			continue;
-		}
 		
 		$orow = $row;
 		

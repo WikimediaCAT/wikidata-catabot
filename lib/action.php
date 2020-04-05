@@ -35,6 +35,82 @@ function createItem( $wbFactory, $row, $props ) {
 	return $itemId;
 }
 
+/* Function for modifying headers */
+// TODO: to be improved
+function performHeaderAction( $wbFactory, $id, $row, $props ){
+
+	$saver = $wbFactory->newRevisionSaver();
+	
+	$revision = $wbFactory->newRevisionGetter()->getFromId( $id );
+	$item = $revision->getContent()->getData();
+
+	$editdesc = $props["desc"];
+
+	$lang = "en";
+	
+	// TO ADD array
+	$toadd = [];
+	// TO DELETE array
+	$todelete = [];
+	// Alias
+	$toalias = array();
+
+	// Two actions: add, delete
+	
+	if ( array_key_exists( "headeradd", $props ) ) {
+		$toadd = $props["headeradd"];
+	}
+	if ( array_key_exists( "headerdelete", $props ) ) {
+		$todelete = $props["headerdelete"];
+	}
+	
+	$numadd = 0;
+	$numdel = 0;
+	
+	if ( array_key_exists( "lang", $props ) ) {
+		$lang = $props["lang"];
+	}
+	
+	foreach ( $toadd as $add ) {
+		
+		if ( array_key_exists( "alias", $add ) ) {
+			
+			if ( array_key_exists( "lang", $add ) ) {
+				$lang = $add["lang"];
+			}
+			
+			$aliasValue = resolveRowValue( $add["alias"], $row );
+			
+			if ( ! array_key_exists( $lang, $toalias ) ) {
+				$toalias[$lang] = [];
+			}
+			
+			array_push( $toalias[$lang], $aliasValue );
+						
+			$numadd++;
+		}
+
+	}
+	
+	foreach ( $todelete as $delete ) {
+		
+		// TODO -> to delete
+	}
+	
+	// Addling all aliases
+	foreach ( $toalias as $lang => $aliasArr ) {
+		$item->setAliases( $lang, $aliasArr );
+	}
+	
+	
+	if ( $numadd > 0 || $numdel > 0 ) {
+		
+		$saver->save( $revision, new MwDM\EditInfo( $editdesc ) );
+		echo "~ Modified header:\t".$id."\t".$row[0]."\n";
+
+	}
+	
+}
 
 /* Function for adding statements */
 function performAction( $wbFactory, $id, $row, $props, $wikiconfig ){
