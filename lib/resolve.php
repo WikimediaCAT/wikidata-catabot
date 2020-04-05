@@ -76,6 +76,8 @@ function retrieveWikidataId( $title, $wikiconfig, $wikidataconfig ){
 		$wdid = $title;
 		
 	} else {
+		
+		$title = urlencode( $title );
 	
 		if ( $wikiconfig ) {
 	
