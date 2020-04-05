@@ -85,7 +85,7 @@ function retrieveWikidataId( $title, $wikiconfig, $wikidataconfig ){
 		// $url = $wikiconfig["url"]."?action=query&prop=wbentityusage&titles=".$title."&format=json";
 		
 		// Below for main WikiData ID
-		// TODO: Adding retry
+		// TODO: Adding retry -> 400 bad request
 		$url = $wikiconfig["url"]."?action=query&titles=".$title."&format=json&prop=pageprops&ppprop=wikibase_item&redirects=true";
 		
 		// Process url
@@ -130,7 +130,7 @@ function retrieveWikidataId( $title, $wikiconfig, $wikidataconfig ){
 				
 				foreach ( $langs as $lang ) {
 					
-					// TODO: Adding retry
+					// TODO: Adding retry -> 400 bad request
 					$url = $wikidataconfig["url"]."?action=wbsearchentities&search=".$title."&format=json&language=".$lang;
 					
 					// Process url
