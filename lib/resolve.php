@@ -79,7 +79,7 @@ function retrieveWikidataId( $title, $wikiconfig, $wikidataconfig ){
 	
 		if ( $wikiconfig ) {
 	
-			sleep( 5 );
+			sleep( 2 );
 	
 			$title = str_replace( " ", "_", $title );
 			
